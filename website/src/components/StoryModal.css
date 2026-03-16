@@ -1,0 +1,359 @@
+/* ═══════════════════════════════════════════════════════════
+   STORY MODAL — minimal dark luxury editorial
+   Class prefix: pp-sm-*  (modal shell)
+                 pp-gal-* (gallery inside modal, scoped)
+   Fonts: DM Serif Display · Outfit
+   Palette: Ink #0d0b09 · Cream #f5f0e8 · Gold #c9974a
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap');
+
+:root {
+  --pp-ink:     #0d0b09;
+  --pp-ink-2:   #161210;
+  --pp-ink-3:   #2a2018;
+  --pp-cream:   #f5f0e8;
+  --pp-gold:    #c9974a;
+  --pp-gold-2:  #e0b876;
+  --pp-muted:   rgba(245, 240, 232, 0.42);
+  --pp-border:  rgba(201, 151, 74, 0.18);
+
+  --ff-display: 'DM Serif Display', Georgia, serif;
+  --ff-body:    'Outfit', system-ui, sans-serif;
+}
+
+@keyframes pp-sm-fade-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pp-shine-sweep {
+  0%   { left: -80%; opacity: 0; }
+  30%  { opacity: 1; }
+  100% { left: 130%; opacity: 0; }
+}
+@keyframes pp-skel {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   BACKDROP
+══════════════════════════════════════════════════════════ */
+.pp-sm-modal + .modal-backdrop,
+.modal-backdrop {
+  background: rgba(13, 11, 9, 0.9) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   MODAL SHELL
+══════════════════════════════════════════════════════════ */
+.pp-sm-modal .modal-dialog {
+  max-width: min(92vw, 860px);
+  margin: auto;
+}
+
+.pp-sm-modal .modal-content {
+  background: var(--pp-ink-2);
+  border: 1px solid var(--pp-border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 48px 120px rgba(13, 11, 9, 0.75);
+  animation: pp-sm-fade-in 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════════════════ */
+.pp-sm-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: var(--pp-ink) !important;
+  border-bottom: 1px solid rgba(201, 151, 74, 0.12) !important;
+  padding: 15px 24px !important;
+  min-height: 0 !important;
+}
+
+.pp-sm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pp-sm-header-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pp-gold);
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+.pp-sm-header-label {
+  font-family: var(--ff-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(201, 151, 74, 0.65);
+}
+
+/* Close button */
+.pp-sm-header .btn-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 151, 74, 0.2) !important;
+  background: transparent !important;
+  opacity: 1 !important;
+  filter: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.25s, color 0.25s, transform 0.25s;
+  position: relative;
+}
+.pp-sm-header .btn-close::before,
+.pp-sm-header .btn-close::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 1px;
+  background: rgba(245, 240, 232, 0.4);
+  border-radius: 1px;
+  transition: background 0.25s;
+}
+.pp-sm-header .btn-close::before { transform: rotate(45deg); }
+.pp-sm-header .btn-close::after  { transform: rotate(-45deg); }
+.pp-sm-header .btn-close:hover {
+  border-color: rgba(201, 151, 74, 0.5) !important;
+  transform: rotate(90deg);
+}
+.pp-sm-header .btn-close:hover::before,
+.pp-sm-header .btn-close:hover::after {
+  background: var(--pp-gold);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   BODY
+══════════════════════════════════════════════════════════ */
+.pp-sm-body {
+  padding: 0 !important;
+  max-height: 84vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 151, 74, 0.3) transparent;
+}
+.pp-sm-body::-webkit-scrollbar       { width: 4px; }
+.pp-sm-body::-webkit-scrollbar-track { background: transparent; }
+.pp-sm-body::-webkit-scrollbar-thumb {
+  background: rgba(201, 151, 74, 0.3);
+  border-radius: 2px;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   TITLE BLOCK
+══════════════════════════════════════════════════════════ */
+.pp-sm-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: clamp(32px, 5vw, 52px) clamp(24px, 6vw, 72px) 28px;
+  gap: 12px;
+}
+
+.pp-sm-orn {
+  color: var(--pp-gold);
+  font-size: 0.7rem;
+  opacity: 0.5;
+  letter-spacing: 0.3em;
+}
+
+.pp-sm-title {
+  font-family: var(--ff-display);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 400;
+  color: var(--pp-cream);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.pp-sm-subtitle {
+  font-family: var(--ff-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pp-gold);
+  margin: 0;
+}
+
+.pp-sm-desc {
+  font-family: var(--ff-body);
+  font-size: 0.9rem;
+  line-height: 1.85;
+  color: var(--pp-muted);
+  max-width: 500px;
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+/* Gradient divider */
+.pp-sm-divider {
+  height: 1px;
+  margin: 4px clamp(24px, 6vw, 72px) 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(201, 151, 74, 0.28) 25%,
+    rgba(201, 151, 74, 0.28) 75%,
+    transparent 100%
+  );
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   GALLERY WRAPPER
+══════════════════════════════════════════════════════════ */
+.pp-sm-gallery-wrap {
+  padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 36px);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   PP-GAL-GRID scoped inside modal
+   Overrides the standalone LuxGallery.css values for the
+   tighter layout inside the modal.
+══════════════════════════════════════════════════════════ */
+.pp-sm-gallery-wrap .pp-gal-grid {
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 160px;
+  gap: 8px;
+}
+
+/* Tall cards inside modal */
+.pp-sm-gallery-wrap .pp-gal-item--tall { grid-row: span 2; }
+
+/* Card inside modal: border style instead of outline */
+.pp-sm-gallery-wrap .pp-gal-item {
+  border: 1px solid rgba(201, 151, 74, 0.1);
+  outline: none;
+  transition: border-color 0.3s;
+}
+.pp-sm-gallery-wrap .pp-gal-item:hover {
+  border-color: rgba(201, 151, 74, 0.32);
+  outline: none;
+}
+
+/* Overlay icon inside modal: pill style instead of circle */
+.pp-sm-gallery-wrap .pp-gal-overlay-icon {
+  font-family: var(--ff-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--pp-gold);
+  border: 1px solid rgba(201, 151, 74, 0.45);
+  border-radius: 5px;
+  padding: 3px 9px;
+  background: rgba(13, 11, 9, 0.55);
+  width: auto;
+  height: auto;
+}
+
+/* Shine animation variant inside modal */
+.pp-sm-gallery-wrap .pp-gal-shine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -80%;
+  width: 50%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(201, 151, 74, 0.15) 50%,
+    transparent 80%
+  );
+  transform: skewX(-15deg);
+  pointer-events: none;
+  opacity: 0;
+  inset: unset; /* override standalone .pp-gal-shine */
+  background-size: unset;
+  background-position: unset;
+  transition: none;
+}
+.pp-sm-gallery-wrap .pp-gal-item:hover .pp-gal-shine {
+  animation: pp-shine-sweep 0.6s ease forwards;
+  background-position: unset;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════════════ */
+.pp-sm-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px clamp(20px, 3vw, 36px) clamp(20px, 3vw, 28px);
+  border-top: 1px solid rgba(201, 151, 74, 0.1);
+}
+
+.pp-sm-counter {
+  font-family: var(--ff-body);
+  font-size: 0.72rem;
+  color: rgba(245, 240, 232, 0.25);
+  letter-spacing: 0.08em;
+}
+
+.pp-sm-cta {
+  padding: 11px 32px !important;
+  font-size: 0.75rem !important;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   GLIGHTBOX LOCK
+══════════════════════════════════════════════════════════ */
+.glightbox-open,
+.glightbox-open body { overflow: hidden !important; }
+
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .pp-sm-modal .modal-dialog {
+    max-width: 96vw;
+    margin: 10px auto;
+  }
+  .pp-sm-gallery-wrap .pp-gal-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 130px;
+  }
+  .pp-sm-gallery-wrap .pp-gal-item--tall { grid-row: span 1; }
+  .pp-sm-footer {
+    flex-direction: column;
+    gap: 14px;
+    text-align: center;
+  }
+  .pp-sm-cta {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .pp-sm-gallery-wrap .pp-gal-grid {
+    grid-auto-rows: 110px;
+    gap: 6px;
+  }
+  .pp-sm-body { max-height: 90vh; }
+}
