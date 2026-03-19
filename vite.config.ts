@@ -2,13 +2,16 @@ import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 // Import the explicit server entry so Vite resolves the correct module
-import { createServer } from "./server/index.js";
+// import { createServer } from "./server/index.js";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,
+    port: 3000,
+    proxy: {
+      '/api': 'http://localhost:8080'
+    },
     fs: {
       allow: [
         path.resolve(__dirname, "."),
@@ -55,10 +58,10 @@ function expressPlugin(): Plugin {
         next();
       });
 
-      const app = createServer({ middlewareMode: true });
+      // const app = createServer({ middlewareMode: true });
 
       // Add Express app as middleware to Vite dev server
-      server.middlewares.use(app);
+      // server.middlewares.use(app);
     },
   };
 }
