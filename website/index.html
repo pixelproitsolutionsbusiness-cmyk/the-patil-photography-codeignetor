@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link id="favicon" rel="icon" type="image/png" href="/assets/img/logo.png" />
+    <link id="favicon" rel="icon" type="image/png" href="assets/img/logo.png" />
     <script>
       // Expose a helper to update the favicon dynamically from any JS/React code.
       // Usage: window.setFavicon('/path/to/icon.png')
@@ -22,7 +22,7 @@
         window.setFavicon = setFavicon;
         // Initialize to default logo (falls back to original if missing)
         try {
-          setFavicon('/assets/img/logo.png');
+          setFavicon('assets/img/logo.png');
         } catch (e) {
           /* ignore */
         }
@@ -56,24 +56,24 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     
     <!-- Vendor CSS Files -->
-    <link href="/assets/vendor/aos/aos.css" rel="stylesheet">
-    <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
     
     <!-- Main CSS File -->
-    <link href="/assets/css/main.css" rel="stylesheet">
+    <link href="assets/css/main.css" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>
     
     <!-- Vendor JS Files -->
-    <script src="/assets/vendor/aos/aos.js"></script>
-    <script src="/assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
     
     <!-- React Helpers -->
-    <script src="/assets/js/react-helpers.js"></script>
+    <script src="assets/js/react-helpers.js"></script>
     
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="./src/main.jsx"></script>
   </body>
 </html>

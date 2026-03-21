@@ -16,7 +16,7 @@ $routes->group('api', function($routes) {
     $routes->resource('gallery');
     $routes->resource('films');
     $routes->resource('services');
-    $routes->resource('event-types');
+    $routes->resource('event-types', ['controller' => 'EventTypes']);
     $routes->resource('clients');
     $routes->resource('enquiries');
     $routes->resource('contacts');
@@ -26,7 +26,7 @@ $routes->group('api', function($routes) {
     $routes->resource('payments');
     $routes->resource('slider');
     $routes->resource('testimonials');
-    $routes->resource('love-stories');
+    $routes->resource('love-stories', ['controller' => 'LoveStories']);
     $routes->resource('team');
     $routes->resource('popup');
 });
