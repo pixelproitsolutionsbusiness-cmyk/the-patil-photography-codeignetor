@@ -19,4 +19,22 @@ class ContactModel extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+    protected $allowCallbacks = true;
+    protected $afterFind      = ['formatId'];
+
+    protected function formatId(array $data)
+    {
+        if (isset($data['data'])) {
+            if (isset($data['data']['id'])) {
+                $data['data']['_id'] = $data['data']['id'];
+            }
+        } else {
+            foreach ($data as &$row) {
+                if (isset($row['id'])) {
+                    $row['_id'] = $row['id'];
+                }
+            }
+        }
+        return $data;
+    }
 }

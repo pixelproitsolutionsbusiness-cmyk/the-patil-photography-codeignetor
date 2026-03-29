@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -58,6 +58,12 @@ function Stars({ n = 5 }) {
     </div>
   );
 }
+
+const getImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http") || url.startsWith("/") || url.startsWith("data:")) return url;
+  return `/${url}`;
+};
 
 /* ─── component ────────────────────────────────────────────── */
 
@@ -143,7 +149,7 @@ export default function Home() {
   const testimonialsToShow = testimonials.slice(0, 3);
 
   /* Extract image URLs for LuxGallery */
-  const galleryImageUrls = gallery.map(item => item.image);
+  const galleryImageUrls = gallery.map(item => getImageUrl(item.image));
 
   const SERVICES = [
     { icon: "◉", title: "Wedding Photography", desc: "Full-day coverage from pre-ceremony to reception — every genuine emotion preserved." },
@@ -180,7 +186,7 @@ export default function Home() {
           {!ldSlider && slides.length > 0 ? (
             slides.map((s, i) => (
               <div key={i} className={`pp-hero-bg ${i === slideIdx ? "active" : ""}`}>
-                <img src={s.image} alt={s.title} />
+                <img src={getImageUrl(s.image)} alt={s.title} />
               </div>
             ))
           ) : (
@@ -348,16 +354,16 @@ export default function Home() {
           ) : stories.length > 0 ? (
             <>
               <div className="pp-stories-grid">
-                {storiesToShow.map((story) => (
+                {storiesToShow.map((story, i) => (
                   <div
-                    key={story._id}
+                    key={story.id || story._id || i}
                     className="pp-story-card"
                     onClick={() => openStory(story)}
                     role="button"
                     tabIndex={0}
                     onKeyDown={e => e.key === "Enter" && openStory(story)}
                   >
-                    <img src={story.thumbnail} alt={story.title} />
+                    <img src={getImageUrl(story.thumbnail)} alt={story.title} />
                     <div className="pp-story-veil" />
                     <div className="pp-story-info">
                       <span className="pp-story-loc">{story.location}</span>
@@ -394,13 +400,13 @@ export default function Home() {
             <>
               <div className="pp-testi-grid">
                 {testimonialsToShow.map((t, i) => (
-                  <div key={t._id || i} className="pp-testi-card">
+                  <div key={t.id || t._id || i} className="pp-testi-card">
                     <div className="pp-testi-quote">"</div>
                     <p className="pp-testi-text">"{t.fullDescription}"</p>
                     <Stars n={t.rating || 5} />
                     <div className="pp-testi-author">
                       <img
-                        src={t.thumbnail || "https://placehold.co/80x80?text=♥"}
+                        src={getImageUrl(t.thumbnail) || "https://placehold.co/80x80?text=♥"}
                         alt={t.coupleName}
                         className="pp-testi-avatar"
                       />

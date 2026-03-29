@@ -10,7 +10,17 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 3000,
     proxy: {
-      '/api': 'http://localhost:8080'
+
+
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      }
+
     },
     fs: {
       allow: [
@@ -33,6 +43,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), expressPlugin()],
+
+
   resolve: {
     dedupe: ["react", "react-dom"],
     alias: {

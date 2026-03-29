@@ -18,6 +18,10 @@ class Team extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['image'])) {
+            $data['image'] = save_base64_image($data['image'], 'team');
+        }
         if ($this->model->insert($data)) {
             return $this->respondCreated($data);
         }
@@ -36,6 +40,11 @@ class Team extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['image'])) {
+            $oldItem = $this->model->find($id);
+            $data['image'] = save_base64_image($data['image'], 'team', $oldItem['image'] ?? null);
+        }
         if ($this->model->update($id, $data)) {
             return $this->respond($data);
         }

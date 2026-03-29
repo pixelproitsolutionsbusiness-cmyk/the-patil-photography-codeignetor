@@ -29,6 +29,7 @@ const emptyAsset = {
 export default function AccessoriesManagement() {
   // start with empty list - remove static sample data
   const [assets, setAssets] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [assetTypes, setAssetTypes] = useState(["Camera", "Lens", "Battery", "Other"]);
@@ -41,6 +42,25 @@ export default function AccessoriesManagement() {
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
 
+  useEffect(() => {
+    fetchAssets();
+  }, []);
+
+  async function fetchAssets() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/accessories");
+      if (!res.ok) throw new Error("Failed to load assets");
+      const data = await res.json();
+      setAssets(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+      setAssets([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const stats = useMemo(() => {
     const total = assets.reduce((sum, a) => sum + Number(a.quantity || 0), 0);
     const needsService = assets.filter((a) => a.condition === "Needs Service").length;
@@ -49,7 +69,7 @@ export default function AccessoriesManagement() {
 
   const filteredAssets = useMemo(() => {
     return assets.filter((a) => {
-      const matchesSearch = [a.name, a.type, a.id]
+      const matchesSearch = [a.name, a.type, a._id]
         .join(" ")
         .toLowerCase()
         .includes(search.toLowerCase());
@@ -72,7 +92,7 @@ export default function AccessoriesManagement() {
         ...asset,
         quantity: asset.quantity?.toString() || "",
       });
-      setEditingId(asset.id);
+      setEditingId(asset._id);
     } else {
       setForm({ ...emptyAsset });
       setEditingId(null);
@@ -92,34 +112,48 @@ export default function AccessoriesManagement() {
     };
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const method = editingId ? "PUT" : "POST";
+      const url = editingId ? `/api/accessories/${editingId}` : "/api/accessories";
 
-      if (editingId) {
-        setAssets((prev) => prev.map((a) => (a.id === editingId ? { ...a, ...payload } : a)));
-      } else {
-        const id =
-          typeof crypto !== "undefined" && crypto.randomUUID
-            ? crypto.randomUUID()
-            : `ASSET-${Date.now()}`;
-        setAssets((prev) => [{ ...payload, id }, ...prev]);
-      }
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Failed to save asset");
+
+      await fetchAssets();
       setModalOpen(false);
     } catch (error) {
       console.error("Failed to save asset", error);
+      alert(error.message);
     } finally {
       setIsSaving(false);
     }
   }
 
-  function toggleServiceFlag(id) {
-    setAssets((prev) =>
-      prev.map((a) =>
-        a.id === id
-          ? { ...a, condition: a.condition === "Needs Service" ? "Great" : "Needs Service" }
-          : a
-      )
-    );
+  async function toggleServiceFlag(id) {
+    const asset = assets.find(a => a._id === id);
+    if (!asset) return;
+
+    const newCondition = asset.condition === "Needs Service" ? "Great" : "Needs Service";
+
+    try {
+      const res = await fetch(`/api/accessories/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ condition: newCondition }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update status");
+      await fetchAssets();
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
   }
+
 
   function createNewType() {
     if (newTypeName.trim() && !assetTypes.includes(newTypeName.trim())) {
@@ -215,10 +249,10 @@ export default function AccessoriesManagement() {
                   </tr>
                 ) : (
                   filteredAssets.map((acc) => (
-                    <tr key={acc.id} className="odd:bg-white even:bg-slate-50">
+                    <tr key={acc._id} className="odd:bg-white even:bg-slate-50">
                       <td className="px-4 py-3">
                         <p className="font-semibold text-charcoal-900">{acc.type} {acc.name && `– ${acc.name}`}</p>
-                        <p className="text-xs text-slate-500">{acc.id}</p>
+                        <p className="text-xs text-slate-500">{acc._id}</p>
                       </td>
                       <td className="px-4 py-3 text-charcoal-900">{acc.quantity || "—"}</td>
                       <td className="px-4 py-3">
@@ -243,7 +277,7 @@ export default function AccessoriesManagement() {
                           {acc.condition && (
                             <button
                               className="rounded-md border border-amber-100 px-3 py-1 text-xs font-semibold text-amber-600 hover:bg-amber-50"
-                              onClick={() => toggleServiceFlag(acc.id)}
+                              onClick={() => toggleServiceFlag(acc._id)}
                             >
                               {acc.condition === "Needs Service" ? "Clear Flag" : "Flag"}
                             </button>
@@ -262,10 +296,10 @@ export default function AccessoriesManagement() {
             ) : (
               filteredAssets.map((acc) => {
                 return (
-                  <div key={acc.id} className="space-y-3 rounded-2xl border border-slate-100 p-4 shadow-sm">
+                  <div key={acc._id} className="space-y-3 rounded-2xl border border-slate-100 p-4 shadow-sm">
                     <div className="flex flex-col gap-1">
                       <p className="text-base font-semibold text-charcoal-900">{acc.type} {acc.name && `– ${acc.name}`}</p>
-                      <p className="text-xs text-slate-500">{acc.id}</p>
+                      <p className="text-xs text-slate-500">{acc._id}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-xs text-slate-500">
                       <div className="font-semibold text-charcoal-900">Qty {acc.quantity || "—"}</div>

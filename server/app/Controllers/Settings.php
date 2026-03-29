@@ -12,14 +12,28 @@ class Settings extends ResourceController
 
     public function index()
     {
-        $model = new SystemSettingsModel();
-        $socialModel = new SocialLinksModel();
-        
-        $settings = $model->getSettings();
-        $settings['socialLinks'] = $socialModel->getLinksBySettings($settings['id']);
-        
-        return $this->respond($settings);
+        try {
+            $model = new SystemSettingsModel();
+            $socialModel = new SocialLinksModel();
+            
+            $settings = $model->getSettings();
+            if (!$settings) {
+                return $this->respond(['error' => 'Settings not found'], 404);
+            }
+            
+            $settings['socialLinks'] = $socialModel->getLinksBySettings($settings['id'] ?? 1);
+            
+            return $this->respond($settings);
+        } catch (\Exception $e) {
+            log_message('error', '[Settings::index] ' . $e->getMessage());
+            return $this->respond([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
+
+
 
     public function update($id = null)
     {
@@ -27,12 +41,14 @@ class Settings extends ResourceController
         $socialModel = new SocialLinksModel();
         
         $data = $this->request->getJSON(true);
+        helper('image');
+        $oldSettings = $model->find(1);
         
         $settingsData = [
             'businessName' => $data['businessName'] ?? null,
-            'primaryLogo' => $data['primaryLogo'] ?? null,
-            'secondaryLogo' => $data['secondaryLogo'] ?? null,
-            'backgroundImage' => $data['backgroundImage'] ?? null,
+            'primaryLogo' => isset($data['primaryLogo']) ? save_base64_image($data['primaryLogo'], 'settings', $oldSettings['primaryLogo'] ?? null) : null,
+            'secondaryLogo' => isset($data['secondaryLogo']) ? save_base64_image($data['secondaryLogo'], 'settings', $oldSettings['secondaryLogo'] ?? null) : null,
+            'backgroundImage' => isset($data['backgroundImage']) ? save_base64_image($data['backgroundImage'], 'settings', $oldSettings['backgroundImage'] ?? null) : null,
             'contactEmail' => $data['contactEmail'] ?? null,
             'contactPhone' => $data['contactPhone'] ?? null,
             'primaryMobileNumber' => $data['primaryMobileNumber'] ?? null,

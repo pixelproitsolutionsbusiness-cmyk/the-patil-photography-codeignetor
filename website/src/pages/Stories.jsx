@@ -77,7 +77,7 @@ export default function Stories() {
               <div className="ps-grid">
                 {stories.map((story, idx) => (
                   <article
-                    key={story._id}
+                    key={story.id || story._id || idx}
                     className="ps-card"
                     style={{ animationDelay: `${idx * 70}ms` }}
                     onClick={() => openStory(story)}

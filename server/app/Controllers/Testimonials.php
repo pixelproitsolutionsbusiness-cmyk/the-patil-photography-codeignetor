@@ -24,6 +24,10 @@ class Testimonials extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['thumbnail'])) {
+            $data['thumbnail'] = save_base64_image($data['thumbnail'], 'testimonials');
+        }
         if ($this->model->insert($data)) {
             return $this->respondCreated($data);
         }
@@ -42,6 +46,11 @@ class Testimonials extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['thumbnail'])) {
+            $oldItem = $this->model->find($id);
+            $data['thumbnail'] = save_base64_image($data['thumbnail'], 'testimonials', $oldItem['thumbnail'] ?? null);
+        }
         if ($this->model->update($id, $data)) {
             return $this->respond($data);
         }

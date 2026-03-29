@@ -138,7 +138,7 @@ export default function Films() {
 
                   return (
                     <article
-                      key={film._id}
+                      key={film.id || film._id || idx}
                       className="pf-card"
                       style={{ animationDelay: `${idx * 60}ms` }}
                       onClick={() =>

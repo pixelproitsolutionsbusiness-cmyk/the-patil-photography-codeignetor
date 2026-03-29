@@ -12,12 +12,21 @@ class Gallery extends ResourceController
 
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        try {
+            return $this->respond($this->model->findAll());
+        } catch (\Exception $e) {
+            return $this->respond(['error' => $e->getMessage()], 500);
+        }
     }
+
 
     public function create()
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['image'])) {
+            $data['image'] = save_base64_image($data['image'], 'gallery');
+        }
         if ($this->model->insert($data)) {
             return $this->respondCreated($data);
         }
@@ -36,6 +45,11 @@ class Gallery extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['image'])) {
+            $oldItem = $this->model->find($id);
+            $data['image'] = save_base64_image($data['image'], 'gallery', $oldItem['image'] ?? null);
+        }
         if ($this->model->update($id, $data)) {
             return $this->respond($data);
         }

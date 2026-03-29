@@ -19,6 +19,10 @@ class Popup extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['image'])) {
+            $data['image'] = save_base64_image($data['image'], 'popups');
+        }
         if ($this->model->insert($data)) {
             return $this->respondCreated($data);
         }
@@ -37,6 +41,11 @@ class Popup extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
+        helper('image');
+        if (isset($data['image'])) {
+            $oldItem = $this->model->find($id);
+            $data['image'] = save_base64_image($data['image'], 'popups', $oldItem['image'] ?? null);
+        }
         if ($this->model->update($id, $data)) {
             return $this->respond($data);
         }
