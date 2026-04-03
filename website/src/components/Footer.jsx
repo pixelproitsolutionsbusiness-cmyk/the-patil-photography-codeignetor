@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../hooks/useSettings";
+import { getImageUrl } from "../lib/apiFetch";
 import "./footer.css";
 
 const ICON_MAP = {
@@ -44,9 +45,9 @@ export default function Footer() {
           <div className="ft-brand">
             <Link to="/" className="ft-logo">
               {logoUrl ? (
-                <img src={logoUrl} alt={businessName} />
+                <img src={getImageUrl(logoUrl)} alt={businessName} />
               ) : (
-                <img src="/assets/img/logo.PNG" alt={businessName} />
+                <img src="assets/img/logo.PNG" alt={businessName} />
               )}
             </Link>
             <p className="ft-tagline">Preserving Pure Emotion<br />in Every Frame.</p>

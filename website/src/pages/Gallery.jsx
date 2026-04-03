@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageHero from "../components/PageHero";
+import { getImageUrl } from "../lib/apiFetch";
 
 const Gallery = () => {
     const [galleryItems, setGalleryItems] = useState([]);
@@ -80,14 +81,14 @@ const Gallery = () => {
                                         <div key={item._id} className="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                                             <div className="gallery-item position-relative overflow-hidden rounded-3 shadow-sm h-100">
                                                 <a
-                                                    href={item.image}
+                                                    href={getImageUrl(item.image)}
                                                     className="glightbox"
                                                     data-gallery="gallery"
                                                     data-title={item.title}
                                                     data-description={item.category}
                                                 >
                                                     <img
-                                                        src={item.image}
+                                                        src={getImageUrl(item.image)}
                                                         alt={item.title}
                                                         className="img-fluid w-100 h-100 object-fit-cover"
                                                         style={{ minHeight: "250px", maxHeight: "300px", objectFit: "cover" }}

@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageHero from "../components/PageHero";
 import { useSettings } from "../hooks/useSettings";
+import { getImageUrl } from "../lib/apiFetch";
 import "./about.css";
 
 const WHY_CHOOSE = [
@@ -43,7 +44,7 @@ export default function About() {
         eyebrow="Our Story"
         title="About Us"
         subtitle="Discover our story and passion for capturing life's beautiful moments"
-        backgroundImage="/assets/img/HomePage/16.webp"
+        backgroundImage="assets/img/HomePage/16.webp"
         breadcrumbs={[
           { label: 'Home', to: '/' },
           { label: 'About Us' }
@@ -56,7 +57,7 @@ export default function About() {
         <section className="ab-founder">
           <div className="ab-founder-img-col">
             <img
-              src="/assets/img/person/founder.jpg"
+              src="assets/img/person/founder.jpg"
               alt={`Founder — ${businessName}`}
             />
             <div className="ab-founder-badge">
@@ -133,7 +134,7 @@ export default function About() {
                 <div className="ab-team-card" key={member._id || i}>
                   <div className="ab-team-img">
                     <img
-                      src={member.image || "/assets/img/logo.PNG"}
+                      src={getImageUrl(member.image) || "assets/img/logo.PNG"}
                       alt={member.name}
                     />
                   </div>

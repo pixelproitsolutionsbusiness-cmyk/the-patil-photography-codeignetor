@@ -1,20 +1,31 @@
+const BASE_URL = import.meta.env.BASE_URL || "/";
 const RAW_BASE_URL = typeof import.meta.env.VITE_API_URL === "string" ? import.meta.env.VITE_API_URL : "";
 const HAS_ABSOLUTE_BASE = /^https?:\/\//i.test(RAW_BASE_URL);
 const API_BASE_URL = HAS_ABSOLUTE_BASE ? RAW_BASE_URL.replace(/\/$/, "") : "";
 const API_PREFIX = "/api";
 
-const buildAbsoluteUrl = (path) => {
-  if (!API_BASE_URL) return path;
-  if (typeof path !== "string") return path;
-  if (!path.startsWith(`${API_PREFIX}/`)) return path;
+// If we are in a subfolder (like /stagging/), we need to prefix the API calls
+const SUBFOLDER_PREFIX = BASE_URL.replace(/\/$/, "");
 
-  const trimmedPath = path.replace(/^\/api/, "");
-  return `${API_BASE_URL}${trimmedPath}`;
+const buildAbsoluteUrl = (path) => {
+  if (typeof path !== "string") return path;
+  
+  // If we have an absolute API URL (like https://api.mysite.com), use it
+  if (API_BASE_URL && path.startsWith(`${API_PREFIX}/`)) {
+    const trimmedPath = path.replace(/^\/api/, "");
+    return `${API_BASE_URL}${trimmedPath}`;
+  }
+
+  // If we are in a subfolder and path starts with /api/, prefix it
+  if (SUBFOLDER_PREFIX && SUBFOLDER_PREFIX !== "" && path.startsWith(`${API_PREFIX}/`)) {
+    return `${SUBFOLDER_PREFIX}${path}`;
+  }
+
+  return path;
 };
 
 const patchFetch = () => {
   if (typeof window === "undefined") return;
-  if (!API_BASE_URL) return;
   if (window.__API_FETCH_PATCHED__) return;
 
   const nativeFetch = window.fetch.bind(window);

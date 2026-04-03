@@ -6,6 +6,8 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // base: "/stagging/",
+  base: "/",
   server: {
     host: "::",
     port: 3000,

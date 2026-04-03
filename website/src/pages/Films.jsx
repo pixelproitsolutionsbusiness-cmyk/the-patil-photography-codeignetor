@@ -83,7 +83,7 @@ export default function Films() {
           eyebrow="Cinematic Storytelling"
           title="Our Films"
           subtitle="Every love story deserves to be felt, not just remembered."
-          backgroundImage="/assets/img/HomePage/84.webp"
+          backgroundImage="assets/img/HomePage/84.webp"
           breadcrumbs={[
             { label: 'Home', to: '/' },
             { label: 'Films' }
