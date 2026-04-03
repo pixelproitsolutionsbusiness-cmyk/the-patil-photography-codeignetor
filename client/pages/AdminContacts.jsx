@@ -41,7 +41,7 @@ export default function AdminContacts() {
             
             // Fetch from all admin components
             const [contactRes, userRes, settingsRes, ordersRes, enquiriesRes, invoicesRes, clientsRes, usersRes] = await Promise.all([
-                fetch("/api/contact"),
+                fetch("/api/contacts"),
                 fetch("/api/users/me"),
                 fetch("/api/settings"),
                 fetch("/api/orders").catch(() => ({ ok: false, json: () => [] })),
@@ -88,7 +88,7 @@ export default function AdminContacts() {
 
     const fetchMessages = async () => {
         try {
-            const res = await fetch("/api/contact");
+            const res = await fetch("/api/contacts");
             const data = await res.json();
             setMessages(Array.isArray(data) ? data : []);
         } catch (error) {
@@ -98,7 +98,7 @@ export default function AdminContacts() {
 
     const updateStatus = async (id, status) => {
         try {
-            const res = await fetch(`/api/contact/${id}/status`, {
+            const res = await fetch(`/api/contacts/${id}/status`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status }),
@@ -121,7 +121,7 @@ export default function AdminContacts() {
         });
         if (!ok) return;
 
-        await fetch(`/api/contact/${id}`, { method: "DELETE" });
+        await fetch(`/api/contacts/${id}`, { method: "DELETE" });
         if (viewDetails?._id === id) setViewDetails(null);
         fetchMessages();
     };

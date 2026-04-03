@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { apiRequest } from "../lib/apiFetch";
+import { apiRequest, getImageUrl } from "../lib/apiFetch";
 import { useToast } from "@/components/ui/use-toast"; // Assuming this exists or similar
 import { Trash2, Edit, Plus, GripVertical, Image as ImageIcon } from "lucide-react";
 import { useConfirm } from "@/components/ConfirmModal";
@@ -178,7 +178,7 @@ export default function AdminTeam() {
                                 <label className="block text-sm font-medium mb-1">Profile Photo</label>
                                 <div className="flex items-center gap-4">
                                     {formData.image && (
-                                        <img src={formData.image} alt="Preview" className="w-16 h-16 rounded-full object-cover" />
+                                        <img src={getImageUrl(formData.image)} alt="Preview" className="w-16 h-16 rounded-full object-cover" />
                                     )}
                                     <Input type="file" accept="image/*" onChange={handleImageUpload} />
                                 </div>
@@ -241,7 +241,7 @@ export default function AdminTeam() {
                                 <div className="flex items-center gap-3">
                                     <div className="w-16 h-16 rounded-full bg-slate-100 overflow-hidden shrink-0">
                                         {member.image ? (
-                                            <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                                            <img src={getImageUrl(member.image)} alt={member.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <ImageIcon className="w-8 h-8 m-auto mt-4 text-slate-400" />
                                         )}

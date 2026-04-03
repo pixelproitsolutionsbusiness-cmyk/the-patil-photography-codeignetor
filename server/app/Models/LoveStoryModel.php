@@ -13,7 +13,7 @@ class LoveStoryModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'title', 'location', 'description', 'thumbnail', 'status', 'created_at', 'updated_at'
+        'title', 'location', 'description', 'thumbnail', 'gallery', 'status', 'order', 'created_at', 'updated_at'
     ];
 
     // Dates
@@ -22,18 +22,36 @@ class LoveStoryModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $allowCallbacks = true;
-    protected $afterFind      = ['formatId'];
+    protected $afterFind      = ['formatId', 'decodeGallery'];
 
     protected function formatId(array $data)
     {
-        if (isset($data['data'])) {
+        if (!isset($data['data'])) return $data;
+
+        if (isset($data['singleton']) && $data['singleton']) {
             if (isset($data['data']['id'])) {
                 $data['data']['_id'] = $data['data']['id'];
             }
         } else {
-            foreach ($data as &$row) {
+            foreach ($data['data'] as &$row) {
                 if (isset($row['id'])) {
                     $row['_id'] = $row['id'];
+                }
+            }
+        }
+        return $data;
+    }
+
+    protected function decodeGallery(array $data)
+    {
+        if (isset($data['data'])) {
+            if (isset($data['singleton']) && $data['singleton']) {
+                $gallery = $data['data']['gallery'] ?? null;
+                $data['data']['gallery'] = is_string($gallery) ? (json_decode($gallery, true) ?: []) : (is_array($gallery) ? $gallery : []);
+            } else {
+                foreach ($data['data'] as &$row) {
+                    $gallery = $row['gallery'] ?? null;
+                    $row['gallery'] = is_string($gallery) ? (json_decode($gallery, true) ?: []) : (is_array($gallery) ? $gallery : []);
                 }
             }
         }

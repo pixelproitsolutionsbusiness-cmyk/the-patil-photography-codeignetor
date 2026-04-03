@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Image as ImageIcon, Filter } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
+import { getImageUrl } from "../lib/apiFetch";
 import {
   Select,
   SelectContent,
@@ -123,7 +124,7 @@ export default function AdminGallery() {
             <div key={item._id} className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
               <div className="relative aspect-square bg-gray-100 flex items-center justify-center overflow-hidden">
                 {item.image ? (
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={getImageUrl(item.image)} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <ImageIcon className="text-gray-400" />
                 )}
@@ -236,7 +237,7 @@ export default function AdminGallery() {
                   />
                   {form.image ? (
                     <div className="relative z-20">
-                      <img src={form.image} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow-sm" />
+                      <img src={getImageUrl(form.image)} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow-sm" />
                       <button
                         type="button"
                         onClick={(e) => { e.preventDefault(); setForm({ ...form, image: "" }); }}

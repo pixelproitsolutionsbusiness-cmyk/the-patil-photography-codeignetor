@@ -67,3 +67,23 @@ if (!function_exists('save_base64_image')) {
         return $base64String;
     }
 }
+
+if (!function_exists('delete_image')) {
+    /**
+     * Deletes a file relative to public/
+     * 
+     * @param string|null $path
+     * @return bool
+     */
+    function delete_image($path) {
+        if (!$path || empty($path) || !is_string($path)) {
+            return false;
+        }
+        
+        $fullPath = FCPATH . $path;
+        if (is_file($fullPath)) {
+            return unlink($fullPath);
+        }
+        return false;
+    }
+}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Edit, Trash2, Plus, ArrowUp, ArrowDown, GripVertical } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
+import { getImageUrl } from "../lib/apiFetch";
 import { useConfirm } from "@/components/ConfirmModal";
 import {
   Select,
@@ -290,9 +291,9 @@ export default function AdminLoveStories() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">Gallery Images</label>
                                     <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                                        {form.gallery.map((img, index) => (
+                                        {(form.gallery || []).map((img, index) => (
                                             <div key={index} className="relative group rounded-md overflow-hidden border">
-                                                <img src={img} alt={`Gallery ${index}`} className="w-full h-24 object-cover" />
+                                                <img src={getImageUrl(img)} alt={`Gallery ${index}`} className="w-full h-24 object-cover" />
                                                 <button
                                                     type="button"
                                                     onClick={() => removeGalleryImage(index)}
@@ -321,7 +322,7 @@ export default function AdminLoveStories() {
                                     <div className="relative rounded-md overflow-hidden border border-gray-200 bg-gray-50 h-48 flex items-center justify-center">
                                         {form.thumbnail ? (
                                             <>
-                                                <img src={form.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
+                                                <img src={getImageUrl(form.thumbnail)} alt="Thumbnail" className="w-full h-full object-cover" />
                                                 <div className="absolute top-3 right-3 flex gap-2">
                                                     <label className="bg-white/90 p-2 rounded-md cursor-pointer shadow-sm text-sm">
                                                         Change
@@ -391,7 +392,7 @@ export default function AdminLoveStories() {
                                     <div className="relative h-40 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shadow-sm group">
                                         {story.thumbnail ? (
                                             <img
-                                                src={story.thumbnail}
+                                                src={getImageUrl(story.thumbnail)}
                                                 alt={story.title}
                                                 className="w-full h-full object-cover"
                                             />
@@ -491,7 +492,7 @@ export default function AdminLoveStories() {
                                     <td className="px-6 py-4">
                                         <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                                             <img
-                                                src={story.thumbnail}
+                                                src={getImageUrl(story.thumbnail)}
                                                 alt={story.title}
                                                 className="w-full h-full object-cover"
                                             />

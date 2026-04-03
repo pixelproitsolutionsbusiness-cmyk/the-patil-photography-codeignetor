@@ -58,7 +58,12 @@ class Gallery extends ResourceController
 
     public function delete($id = null)
     {
+        $oldItem = $this->model->find($id);
         if ($this->model->delete($id)) {
+            if ($oldItem && isset($oldItem['image'])) {
+                helper('image');
+                delete_image($oldItem['image']);
+            }
             return $this->respondDeleted(['id' => $id]);
         }
         return $this->fail($this->model->errors());

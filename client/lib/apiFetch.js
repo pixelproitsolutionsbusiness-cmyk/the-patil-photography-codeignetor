@@ -65,4 +65,37 @@ export const apiRequest = (input, init) => {
   return window.fetch(input, init);
 };
 
+export const getImageUrl = (url) => {
+  if (!url) return "";
+  if (typeof url !== "string") return url;
+  if (url.startsWith("http") || url.startsWith("data:")) return url;
+
+  const siteBase = import.meta.env.BASE_URL || "/";
+  const imageBase = import.meta.env.VITE_IMAGE_BASE_URL || "/uploads"; // Proxy root
+  
+  const SUBFOLDER = siteBase.replace(/\/$/, "");
+  
+  // If it's a database path (starts with uploads/ or /uploads/)
+  if (url.startsWith("uploads/") || url.startsWith("/uploads/")) {
+    const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+    const finalBase = (imageBase.startsWith("/") && SUBFOLDER) ? `${SUBFOLDER}${imageBase}` : imageBase;
+    const finalBaseUrl = finalBase.endsWith("/") ? finalBase : `${finalBase}/`;
+    return `${finalBaseUrl}${cleanPath.replace(/^uploads\//, "")}`;
+  }
+
+  // If it's a static root asset
+  if (url.startsWith("assets/") || url.startsWith("/assets/")) {
+    const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+    const finalBase = SUBFOLDER ? `${SUBFOLDER}/${cleanPath}` : `/${cleanPath}`;
+    return finalBase;
+  }
+
+  // Fallback to absolute if it was a slash-lead path
+  if (url.startsWith("/")) {
+    return SUBFOLDER ? `${SUBFOLDER}${url}` : url;
+  }
+  
+  return url;
+};
+
 export { };

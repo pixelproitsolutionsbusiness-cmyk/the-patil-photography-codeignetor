@@ -25,6 +25,7 @@ $routes->resource('event-types', ['controller' => 'EventTypes']);
 $routes->resource('clients', ['controller' => 'Clients']);
 $routes->resource('enquiries', ['controller' => 'Enquiries']);
 $routes->resource('contacts', ['controller' => 'Contacts']);
+$routes->resource('contact', ['controller' => 'Contacts']);
 $routes->resource('invoices', ['controller' => 'Invoices']);
 $routes->resource('quotations', ['controller' => 'Quotations']);
 $routes->resource('payments', ['controller' => 'Payments']);
@@ -59,6 +60,7 @@ $routes->group('api', function($routes) {
     $routes->resource('clients', ['controller' => 'Clients']);
     $routes->resource('enquiries', ['controller' => 'Enquiries']);
     $routes->resource('contacts', ['controller' => 'Contacts']);
+    $routes->resource('contact', ['controller' => 'Contacts']);
     $routes->resource('invoices', ['controller' => 'Invoices']);
     $routes->resource('quotations', ['controller' => 'Quotations']);
     $routes->resource('payments', ['controller' => 'Payments']);

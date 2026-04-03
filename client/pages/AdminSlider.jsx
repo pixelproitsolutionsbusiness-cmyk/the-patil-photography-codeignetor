@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Image as ImageIcon, ChevronUp, ChevronDown, GripVertical, ArrowUp, ArrowDown } from "lucide-react";
 import Skeleton from "../components/Skeleton";
 import PageHeader from "../components/PageHeader";
+import { getImageUrl } from "../lib/apiFetch";
 import {
   Select,
   SelectContent,
@@ -181,7 +182,7 @@ export default function AdminSlider() {
                 <div key={slider._id} className="p-4 space-y-3">
                   <div className="relative h-40 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 shadow-sm group">
                     {slider.image ? (
-                      <img src={slider.image} alt={slider.title} className="w-full h-full object-cover" />
+                      <img src={getImageUrl(slider.image)} alt={slider.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <ImageIcon className="text-gray-400" size={32} />
@@ -287,7 +288,7 @@ export default function AdminSlider() {
                     <td className="p-4">
                       <div className="w-32 h-20 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 shadow-sm group">
                         {slider.image ? (
-                          <img src={slider.image} alt={slider.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                          <img src={getImageUrl(slider.image)} alt={slider.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                         ) : (
                           <ImageIcon className="text-gray-400" />
                         )}
@@ -420,7 +421,7 @@ export default function AdminSlider() {
                   />
                   {form.image ? (
                     <div className="relative z-20">
-                      <img src={form.image} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow-sm" />
+                      <img src={getImageUrl(form.image)} alt="Preview" className="w-full h-48 object-cover rounded-lg shadow-sm" />
                       <button
                         type="button"
                         onClick={(e) => { e.preventDefault(); setForm({ ...form, image: "" }); }}
