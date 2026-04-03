@@ -1,0 +1,25 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1. API: Route /api to the CI4 server
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^api/(.*)$ server/public/index.php/$1 [L,QSA]
+
+  # 2. Uploads: Bridge /uploads to server uploads
+  RewriteRule ^uploads/(.*)$ server/public/uploads/$1 [L]
+
+  # 3. Admin: Support SPA routing for /admin/
+  RewriteCond %{REQUEST_URI} ^/admin/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^admin/(.*)$ admin/index.html [L,QSA]
+
+  # 4. Website: Support SPA routing for main site
+  RewriteCond %{REQUEST_URI} !^/api/
+  RewriteCond %{REQUEST_URI} !^/admin/
+  RewriteCond %{REQUEST_URI} !^/server/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
