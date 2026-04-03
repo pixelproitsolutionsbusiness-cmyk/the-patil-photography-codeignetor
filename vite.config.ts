@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => ({
   },
 }));
 
-console.log('Vite config loaded - triggering restart ' + 1712165000); // 2024-04-03
+console.log('Vite config loaded - triggering restart ' + 1712165555); // Finally relative
 function expressPlugin(): Plugin {
   return {
     name: "express-plugin",

@@ -67,6 +67,7 @@ export const getImageUrl = (url) => {
   const apiBase = import.meta.env.VITE_API_URL || "/api/";
   const imageBase = import.meta.env.VITE_IMAGE_BASE_URL; // Priority for uploads
   
+  const SUBFOLDER = siteBase.replace(/\/$/, "");
   const apiBaseUrl = apiBase.endsWith("/") ? apiBase : `${apiBase}/`;
   const imageBaseUrl = imageBase ? (imageBase.endsWith("/") ? imageBase : `${imageBase}/`) : null;
 
@@ -75,9 +76,13 @@ export const getImageUrl = (url) => {
     const cleanPath = url.startsWith("/") ? url.substring(1) : url;
     // Use dedicated image base if provided, otherwise fallback to API base
     if (imageBaseUrl) {
-      return `${imageBaseUrl}${cleanPath.replace(/^uploads\//, "")}`;
+      // If imageBaseUrl is relative (starts with /), add the subfolder
+      const finalBase = (imageBaseUrl.startsWith("/") && SUBFOLDER) ? `${SUBFOLDER}${imageBaseUrl}` : imageBaseUrl;
+      return `${finalBase}${cleanPath.replace(/^uploads\//, "")}`;
     }
-    return `${apiBaseUrl}${cleanPath}`;
+    // Fallback to API base
+    const finalApiBase = (apiBaseUrl.startsWith("/") && SUBFOLDER) ? `${SUBFOLDER}${apiBaseUrl}` : apiBaseUrl;
+    return `${finalApiBase}${cleanPath}`;
   }
 
   // 2. If it's a static asset (assets/...), use the site base
