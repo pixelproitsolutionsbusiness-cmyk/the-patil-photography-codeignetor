@@ -47,7 +47,7 @@ export default function Footer() {
               {logoUrl ? (
                 <img src={getImageUrl(logoUrl)} alt={businessName} />
               ) : (
-                <img src="assets/img/logo.PNG" alt={businessName} />
+                <img src={getImageUrl("assets/img/logo.PNG")} alt={businessName} />
               )}
             </Link>
             <p className="ft-tagline">Preserving Pure Emotion<br />in Every Frame.</p>

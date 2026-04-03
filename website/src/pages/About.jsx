@@ -44,7 +44,7 @@ export default function About() {
         eyebrow="Our Story"
         title="About Us"
         subtitle="Discover our story and passion for capturing life's beautiful moments"
-        backgroundImage="assets/img/HomePage/16.webp"
+        backgroundImage={getImageUrl("assets/img/HomePage/16.webp")}
         breadcrumbs={[
           { label: 'Home', to: '/' },
           { label: 'About Us' }
@@ -57,7 +57,7 @@ export default function About() {
         <section className="ab-founder">
           <div className="ab-founder-img-col">
             <img
-              src="assets/img/person/founder.jpg"
+              src={getImageUrl("assets/img/person/founder.jpg")}
               alt={`Founder — ${businessName}`}
             />
             <div className="ab-founder-badge">

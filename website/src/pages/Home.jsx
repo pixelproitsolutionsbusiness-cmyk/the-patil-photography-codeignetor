@@ -461,7 +461,7 @@ export default function Home() {
                 rel="noreferrer"
                 className="pp-insta-item"
               >
-                <img src={src} alt="Instagram post" />
+                <img src={getImageUrl(src)} alt="Instagram post" />
               </a>
             ))}
           </div>

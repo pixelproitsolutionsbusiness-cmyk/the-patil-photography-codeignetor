@@ -141,7 +141,7 @@ const storyData = {
     title: "Komal & Kunal",
     subtitle: "The Golden Leaf Resort, Dhule",
     description: `
-      KKomal and Kunal’s journey is a beautiful blend of warmth, destiny, and heartfelt moments. What began as a simple connection slowly grew into a bond filled with trust, understanding, and companionship. Their love strengthened through shared dreams, thoughtful conversations, and unwavering support. Together, they continue to create memories that reflect a deep, genuine, and lifelong commitment.
+      Komal and Kunal’s journey is a beautiful blend of warmth, destiny, and heartfelt moments. What began as a simple connection slowly grew into a bond filled with trust, understanding, and companionship. Their love strengthened through shared dreams, thoughtful conversations, and unwavering support. Together, they continue to create memories that reflect a deep, genuine, and lifelong commitment.
     `,
     images: [
       "assets/img/HomePage/11.webp",

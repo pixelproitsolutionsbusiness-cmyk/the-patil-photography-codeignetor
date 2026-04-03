@@ -65,25 +65,34 @@ export const getImageUrl = (url) => {
 
   const siteBase = import.meta.env.BASE_URL || "/";
   const apiBase = import.meta.env.VITE_API_URL || "/api/";
+  const imageBase = import.meta.env.VITE_IMAGE_BASE_URL; // Priority for uploads
+  
   const apiBaseUrl = apiBase.endsWith("/") ? apiBase : `${apiBase}/`;
+  const imageBaseUrl = imageBase ? (imageBase.endsWith("/") ? imageBase : `${imageBase}/`) : null;
 
-  // 1. If it's a database upload, use the API base
+  // 1. If it's a database upload, use the IMAGE base or fallback to API base
   if (url.startsWith("uploads/") || url.startsWith("/uploads/")) {
     const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+    // Use dedicated image base if provided, otherwise fallback to API base
+    if (imageBaseUrl) {
+      return `${imageBaseUrl}${cleanPath.replace(/^uploads\//, "")}`;
+    }
     return `${apiBaseUrl}${cleanPath}`;
   }
 
   // 2. If it's a static asset (assets/...), use the site base
   if (url.startsWith("assets/") || url.startsWith("/assets/")) {
     const cleanPath = url.startsWith("/") ? url.substring(1) : url;
-    return `${siteBase}${cleanPath}`;
+    const siteBaseUrl = siteBase.endsWith("/") ? siteBase : `${siteBase}/`;
+    return `${siteBaseUrl}${cleanPath}`;
   }
 
   // Fallback
+  const siteBaseUrl = siteBase.endsWith("/") ? siteBase : `${siteBase}/`;
   if (url.startsWith("/")) {
-    return `${siteBase}${url.substring(1)}`;
+    return `${siteBaseUrl}${url.substring(1)}`;
   }
-  return `${siteBase}${url}`;
+  return `${siteBaseUrl}${url}`;
 };
 
 patchFetch();

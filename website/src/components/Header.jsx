@@ -57,7 +57,7 @@ export default function Header() {
           {settings?.primaryLogo ? (
             <img src={getImageUrl(settings.primaryLogo)} alt={settings?.businessName || "Logo"} />
           ) : (
-            <img src="assets/img/logo.PNG" alt="Logo" />
+            <img src={getImageUrl("assets/img/logo.PNG")} alt="Logo" />
           )}
         </Link>
 
