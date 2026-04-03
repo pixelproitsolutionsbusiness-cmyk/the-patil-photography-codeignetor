@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageHero from "../components/PageHero";
+import { getImageUrl } from "../lib/apiFetch";
 import "./films.css";
 
 /* ─── helpers ──────────────────────────────────────────── */
@@ -83,7 +84,7 @@ export default function Films() {
           eyebrow="Cinematic Storytelling"
           title="Our Films"
           subtitle="Every love story deserves to be felt, not just remembered."
-          backgroundImage="/assets/img/HomePage/84.webp"
+          backgroundImage={getImageUrl("assets/img/HomePage/84.webp")}
           breadcrumbs={[
             { label: 'Home', to: '/' },
             { label: 'Films' }

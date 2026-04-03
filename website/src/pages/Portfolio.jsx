@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import LuxGallery from "../components/LuxGallery";
 import PageHero from "../components/PageHero";
+import { getImageUrl } from "../lib/apiFetch";
 import "./portfolio.css";
 
 /* ═══════════════════════════════════════════════════════════
@@ -298,7 +299,7 @@ const Portfolio = () => {
       : portfolioImages.filter((img) => img.category === activeCategory);
 
   // Extract URLs for LuxGallery
-  const imageUrls = filteredImages.map((item) => item.image);
+  const imageUrls = filteredImages.map((item) => getImageUrl(item.image));
 
   const tabs = [
     { id: "All", label: "All" },
@@ -318,7 +319,7 @@ const Portfolio = () => {
           eyebrow="Wedding · Portrait · Cinema"
           title="Our Portfolio"
           subtitle="Timeless frames and cinematic stories, crafted with intention."
-          backgroundImage="/assets/img/HomePage/11.webp"
+          backgroundImage={getImageUrl("assets/img/HomePage/11.webp")}
           breadcrumbs={[
             { label: 'Home', to: '/' },
             { label: 'Portfolio' }

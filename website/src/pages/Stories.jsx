@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import StoryModal from "../components/StoryModal";
 import PageHero from "../components/PageHero";
+import { getImageUrl } from "../lib/apiFetch";
 import "./stories.css";
 
 export default function Stories() {
@@ -88,7 +89,7 @@ export default function Stories() {
                   >
                     {/* thumbnail */}
                     <div className="ps-card-thumb">
-                      <img src={story.thumbnail} alt={story.title} loading="lazy" />
+                      <img src={getImageUrl(story.thumbnail)} alt={story.title} loading="lazy" />
                       <div className="ps-card-veil" />
 
                       {/* hover cta */}

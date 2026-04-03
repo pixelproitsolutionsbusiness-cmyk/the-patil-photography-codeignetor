@@ -6,6 +6,8 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // base: "/stagging/",
+  base: "/",
   server: {
     host: "::",
     port: 3000,
@@ -55,7 +57,7 @@ export default defineConfig(({ mode }) => ({
   },
 }));
 
-console.log('Vite config loaded - triggering restart ' + Date.now());
+console.log('Vite config loaded - triggering restart ' + 1712165555); // Finally relative
 function expressPlugin(): Plugin {
   return {
     name: "express-plugin",

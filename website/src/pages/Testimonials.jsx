@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageHero from "../components/PageHero";
+import { getImageUrl } from "../lib/apiFetch";
 import "./Testimonials.css";
 
 export default function Testimonials() {
@@ -244,7 +245,7 @@ export default function Testimonials() {
                       <div className="tm-card-divider" />
                       <div className="tm-card-author">
                         {r.thumbnail && (
-                          <img src={r.thumbnail} alt={r.coupleName} className="tm-avatar" />
+                          <img src={getImageUrl(r.thumbnail)} alt={r.coupleName} className="tm-avatar" />
                         )}
                         <div>
                           <strong className="tm-author-name">{r.coupleName}</strong>

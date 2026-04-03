@@ -83,11 +83,14 @@ export default function AdminEnquiries() {
     };
 
     const filteredEnquiries = useMemo(() => {
-        return enquiries.filter(enquiry => {
-            const matchesSearch = enquiry.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                enquiry.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                enquiry.eventType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                enquiry.phone?.includes(searchTerm);
+        return (enquiries || []).filter(enquiry => {
+            const searchStr = searchTerm.toLowerCase();
+            const matchesSearch = !searchTerm || 
+                                (enquiry.groomName?.toLowerCase().includes(searchStr)) ||
+                                (enquiry.brideName?.toLowerCase().includes(searchStr)) ||
+                                (enquiry.email?.toLowerCase().includes(searchStr)) ||
+                                (enquiry.phoneNumber?.includes(searchTerm)) ||
+                                (enquiry.location?.toLowerCase().includes(searchStr));
             const matchesFilter = filter === "All" || enquiry.status === filter;
             return matchesSearch && matchesFilter;
         });

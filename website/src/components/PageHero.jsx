@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "../lib/apiFetch";
 import "./PageHero.css";
 
 export default function PageHero({
@@ -16,7 +17,7 @@ export default function PageHero({
   return (
     <section className={`page-hero ${className}`}>
       <div className="page-hero-bg">
-        <img src={backgroundImage} alt={backgroundAlt || title || "Hero background"} />
+        <img src={getImageUrl(backgroundImage)} alt={backgroundAlt || title || "Hero background"} />
       </div>
       <div className="page-hero-veil" />
 

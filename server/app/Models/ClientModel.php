@@ -28,12 +28,14 @@ class ClientModel extends Model
 
     protected function formatId(array $data)
     {
-        if (isset($data['data'])) {
+        if (!isset($data['data'])) return $data;
+
+        if (isset($data['singleton']) && $data['singleton']) {
             if (isset($data['data']['id'])) {
                 $data['data']['_id'] = $data['data']['id'];
             }
         } else {
-            foreach ($data as &$row) {
+            foreach ($data['data'] as &$row) {
                 if (isset($row['id'])) {
                     $row['_id'] = $row['id'];
                 }

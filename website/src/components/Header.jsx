@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSettings } from "../hooks/useSettings";
+import { getImageUrl } from "../lib/apiFetch";
 import "./header.css";
 
 const NAV_LINKS = [
@@ -54,9 +55,9 @@ export default function Header() {
         {/* ── LOGO ── */}
         <Link to="/" className="hd-logo" onClick={() => setMobileOpen(false)}>
           {settings?.primaryLogo ? (
-            <img src={settings.primaryLogo} alt={settings?.businessName || "Logo"} />
+            <img src={getImageUrl(settings.primaryLogo)} alt={settings?.businessName || "Logo"} />
           ) : (
-            <img src="/assets/img/logo.PNG" alt="Logo" />
+            <img src={getImageUrl("assets/img/logo.PNG")} alt="Logo" />
           )}
         </Link>
 

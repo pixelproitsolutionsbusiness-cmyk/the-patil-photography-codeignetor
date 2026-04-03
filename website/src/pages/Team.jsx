@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import PageHero from "../components/PageHero";
+import { getImageUrl } from "../lib/apiFetch";
 import "../App.css";
 
 const Team = () => {
@@ -32,7 +33,7 @@ const Team = () => {
             <PageHero
                 title="Our Team"
                 subtitle="The Creative Souls Capturing Your Story"
-                backgroundImage="/assets/img/HomePage/16.webp"
+                backgroundImage={getImageUrl("/assets/img/HomePage/16.webp")}
                 breadcrumbs={[
                     { label: 'Home', to: '/' },
                     { label: 'Team' }
@@ -59,7 +60,7 @@ const Team = () => {
                                                         <div style={{ background: '#fff', borderRadius: '12px', padding: '14px', boxShadow: '0 6px 18px rgba(24,24,24,0.06)', border: '1px solid #eee', transition: 'transform .22s ease', display: 'flex', flexDirection: 'column', gap: '12px' }} onMouseEnter={(e)=> e.currentTarget.style.transform='translateY(-4px)'} onMouseLeave={(e)=> e.currentTarget.style.transform='translateY(0)'}>
                                                             <div style={{ borderRadius: '10px', overflow: 'hidden', background: '#f5f5f5' }}>
                                                                 <div style={{ width: '100%', height: '320px', overflow: 'hidden' }}>
-                                                                    <img src={member.image || '/assets/img/logo.PNG'} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                                                <img src={getImageUrl(member.image) || getImageUrl('/assets/img/logo.PNG')} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                                                 </div>
                                                             </div>
 

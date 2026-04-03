@@ -6,6 +6,7 @@ import StoryModal from "../components/StoryModal";
 import TributeModal from "../components/TributeModal";
 import LuxGallery from "../components/LuxGallery";
 import { useSettings } from "../hooks/useSettings";
+import { getImageUrl } from "../lib/apiFetch";
 import "../styles/home.css";
 
 /* ─── tiny helpers ─────────────────────────────────────────── */
@@ -59,11 +60,6 @@ function Stars({ n = 5 }) {
   );
 }
 
-const getImageUrl = (url) => {
-  if (!url) return "";
-  if (url.startsWith("http") || url.startsWith("/") || url.startsWith("data:")) return url;
-  return `/${url}`;
-};
 
 /* ─── component ────────────────────────────────────────────── */
 
@@ -191,7 +187,7 @@ export default function Home() {
             ))
           ) : (
             <div className="pp-hero-bg active">
-              <img src="/website/assets/img/HomePage/website_4.webp" alt="hero" />
+              <img src={getImageUrl("assets/img/HomePage/website_4.webp")} alt="hero" />
             </div>
           )}
 
@@ -239,7 +235,7 @@ export default function Home() {
         {/* ══ ABOUT ═════════════════════════════════════════════ */}
         <section className="pp-about">
           <div className="pp-about-img-col">
-            <img src="/website/assets/img/HomePage/website_1.webp" alt="about" />
+            <img src={getImageUrl("assets/img/HomePage/website_1.webp")} alt="about" />
             <div className="pp-about-badge">
               <span className="badge-num">300+</span>
               <span className="badge-label">Happy Couples</span>
@@ -451,12 +447,12 @@ export default function Home() {
 
           <div className="pp-insta-grid">
             {[
-              "/assets/img/HomePage/7.webp",
-              "/assets/img/HomePage/11.webp",
-              "/assets/img/HomePage/16.webp",
-              "/assets/img/HomePage/18.webp",
-              "/assets/img/HomePage/128.webp",
-              "/assets/img/HomePage/7.webp",
+              "assets/img/HomePage/7.webp",
+              "assets/img/HomePage/11.webp",
+              "assets/img/HomePage/16.webp",
+              "assets/img/HomePage/18.webp",
+              "assets/img/HomePage/128.webp",
+              "assets/img/HomePage/7.webp",
             ].map((src, i) => (
               <a
                 key={i}
@@ -465,7 +461,7 @@ export default function Home() {
                 rel="noreferrer"
                 className="pp-insta-item"
               >
-                <img src={src} alt="Instagram post" />
+                <img src={getImageUrl(src)} alt="Instagram post" />
               </a>
             ))}
           </div>

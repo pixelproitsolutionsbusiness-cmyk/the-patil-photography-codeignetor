@@ -1,20 +1,31 @@
+const BASE_URL = import.meta.env.BASE_URL || "/";
 const RAW_BASE_URL = typeof import.meta.env.VITE_API_URL === "string" ? import.meta.env.VITE_API_URL : "";
 const HAS_ABSOLUTE_BASE = /^https?:\/\//i.test(RAW_BASE_URL);
 const API_BASE_URL = HAS_ABSOLUTE_BASE ? RAW_BASE_URL.replace(/\/$/, "") : "";
 const API_PREFIX = "/api";
 
-const buildAbsoluteUrl = (path) => {
-  if (!API_BASE_URL) return path;
-  if (typeof path !== "string") return path;
-  if (!path.startsWith(`${API_PREFIX}/`)) return path;
+// If we are in a subfolder (like /stagging/), we need to prefix the API calls
+const SUBFOLDER_PREFIX = BASE_URL.replace(/\/$/, "");
 
-  const trimmedPath = path.replace(/^\/api/, "");
-  return `${API_BASE_URL}${trimmedPath}`;
+const buildAbsoluteUrl = (path) => {
+  if (typeof path !== "string") return path;
+  
+  // If we have an absolute API URL (like https://api.mysite.com), use it
+  if (API_BASE_URL && path.startsWith(`${API_PREFIX}/`)) {
+    const trimmedPath = path.replace(/^\/api/, "");
+    return `${API_BASE_URL}${trimmedPath}`;
+  }
+
+  // If we are in a subfolder and path starts with /api/, prefix it
+  if (SUBFOLDER_PREFIX && SUBFOLDER_PREFIX !== "" && path.startsWith(`${API_PREFIX}/`)) {
+    return `${SUBFOLDER_PREFIX}${path}`;
+  }
+
+  return path;
 };
 
 const patchFetch = () => {
   if (typeof window === "undefined") return;
-  if (!API_BASE_URL) return;
   if (window.__API_FETCH_PATCHED__) return;
 
   const nativeFetch = window.fetch.bind(window);
@@ -52,6 +63,39 @@ patchFetch();
 // Basic wrapper around native fetch that just ensures global fetch is patched
 export const apiRequest = (input, init) => {
   return window.fetch(input, init);
+};
+
+export const getImageUrl = (url) => {
+  if (!url) return "";
+  if (typeof url !== "string") return url;
+  if (url.startsWith("http") || url.startsWith("data:")) return url;
+
+  const siteBase = import.meta.env.BASE_URL || "/";
+  const imageBase = import.meta.env.VITE_IMAGE_BASE_URL || "/uploads"; // Proxy root
+  
+  const SUBFOLDER = siteBase.replace(/\/$/, "");
+  
+  // If it's a database path (starts with uploads/ or /uploads/)
+  if (url.startsWith("uploads/") || url.startsWith("/uploads/")) {
+    const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+    const finalBase = (imageBase.startsWith("/") && SUBFOLDER) ? `${SUBFOLDER}${imageBase}` : imageBase;
+    const finalBaseUrl = finalBase.endsWith("/") ? finalBase : `${finalBase}/`;
+    return `${finalBaseUrl}${cleanPath.replace(/^uploads\//, "")}`;
+  }
+
+  // If it's a static root asset
+  if (url.startsWith("assets/") || url.startsWith("/assets/")) {
+    const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+    const finalBase = SUBFOLDER ? `${SUBFOLDER}/${cleanPath}` : `/${cleanPath}`;
+    return finalBase;
+  }
+
+  // Fallback to absolute if it was a slash-lead path
+  if (url.startsWith("/")) {
+    return SUBFOLDER ? `${SUBFOLDER}${url}` : url;
+  }
+  
+  return url;
 };
 
 export { };

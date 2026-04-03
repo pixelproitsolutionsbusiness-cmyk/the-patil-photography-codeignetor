@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Save, Plus, Trash2, Upload, Link as LinkIcon, Globe, Mail, MapPin, Phone } from "lucide-react";
 import { useSettings } from "../hooks/useSettings";
 import PageHeader from "../components/PageHeader";
+import { getImageUrl } from "../lib/apiFetch";
 
 const PLATFORMS = ['WhatsApp', 'Instagram', 'Facebook', 'YouTube', 'Twitter', 'LinkedIn', 'Other'];
 
@@ -382,7 +383,7 @@ export default function AdminSettings() {
                                 <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-900 min-h-[160px] hover:bg-gray-800 transition-colors">
                                     {formData.primaryLogo ? (
                                         <div className="relative w-full h-32 flex items-center justify-center">
-                                            <img src={formData.primaryLogo} alt="Primary Logo" className="max-h-full max-w-full object-contain" />
+                                            <img src={getImageUrl(formData.primaryLogo)} alt="Primary Logo" className="max-h-full max-w-full object-contain" />
                                             <button
                                                 onClick={() => setFormData(prev => ({ ...prev, primaryLogo: "" }))}
                                                 className="absolute -top-2 -right-2 bg-white text-red-500 p-1.5 rounded-full shadow-md border hover:bg-red-50"
@@ -413,7 +414,7 @@ export default function AdminSettings() {
                                 <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center bg-gray-50 min-h-[160px] hover:bg-gray-100 transition-colors">
                                     {formData.secondaryLogo ? (
                                         <div className="relative w-full h-32 flex items-center justify-center">
-                                            <img src={formData.secondaryLogo} alt="Secondary Logo" className="max-h-full max-w-full object-contain" />
+                                            <img src={getImageUrl(formData.secondaryLogo)} alt="Secondary Logo" className="max-h-full max-w-full object-contain" />
                                             <button
                                                 onClick={() => setFormData(prev => ({ ...prev, secondaryLogo: "" }))}
                                                 className="absolute -top-2 -right-2 bg-white text-red-500 p-1.5 rounded-full shadow-md border hover:bg-red-50"
@@ -448,7 +449,7 @@ export default function AdminSettings() {
                         <div className="relative group border-2 border-dashed border-gray-200 rounded-xl p-4 flex items-center justify-center bg-gray-50 min-h-[160px]">
                             {formData.backgroundImage ? (
                                 <div className="relative w-full h-40 flex items-center justify-center">
-                                    <img src={formData.backgroundImage} alt="Background preview" className="w-full h-full object-cover rounded-md" />
+                                    <img src={getImageUrl(formData.backgroundImage)} alt="Background preview" className="w-full h-full object-cover rounded-md" />
                                     <button
                                         onClick={() => setFormData(prev => ({ ...prev, backgroundImage: "" }))}
                                         className="absolute -top-2 -right-2 bg-white text-red-500 p-1.5 rounded-full shadow-md border hover:bg-red-50"
