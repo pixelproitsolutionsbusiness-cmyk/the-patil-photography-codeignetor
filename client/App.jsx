@@ -1,5 +1,6 @@
 import "./global.css";
 import "./lib/apiFetch";
+import { getImageUrl } from "./lib/apiFetch";
 import React, { useEffect, useState } from "react";
 import { Menu, Instagram, Facebook, Youtube, Twitter, Linkedin, Link as LinkIcon, User, Key, LogOut, Radio, RefreshCcw, Mail, PanelLeft, MessageCircle, Globe } from "lucide-react";
 import {
@@ -104,6 +105,7 @@ const useAutoLogout = (logoutCallback) => {
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   if (!token) {
+    // Navigate to admin root (Login) if not authenticated
     return <Navigate to="/admin" replace />;
   }
   return children;
@@ -129,6 +131,7 @@ const App = () => (
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Navigate to="/admin" replace />} />
+          <Route path="/admin/" element={<AdminRedirect />} />
           <Route path="/admin" element={<AdminRedirect />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -166,7 +169,7 @@ const AppShell = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("rememberMe");
-    navigate("/admin");
+    window.location.href = "/admin"; // Force reload to clear all states and routes
   };
 
   useAutoLogout(handleLogout);
@@ -190,7 +193,7 @@ const AppShell = () => {
         document.title = settings.businessName + " | Admin Console";
       }
       // Use secondary logo for favicon, fallback to primary logo
-      const faviconUrl = settings.secondaryLogo || settings.primaryLogo;
+      const faviconUrl = getImageUrl(settings.secondaryLogo || settings.primaryLogo);
       if (faviconUrl) {
         if (window.setFavicon) {
           window.setFavicon(faviconUrl);
