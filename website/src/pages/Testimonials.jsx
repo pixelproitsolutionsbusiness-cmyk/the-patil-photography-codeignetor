@@ -58,7 +58,16 @@ export default function Testimonials() {
     document.body.className = "reviews-feedback-page";
     fetch("/api/testimonials?type=active")
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setTestimonials(d); })
+      .then(d => { 
+        if (Array.isArray(d)) {
+          setTestimonials(d.map(item => ({
+            ...item,
+            coupleName: item.name || item.coupleName || "",
+            location: item.role || item.location || "",
+            fullDescription: item.text || item.fullDescription || ""
+          })));
+        } 
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
     return () => { document.body.className = ""; };
@@ -72,9 +81,9 @@ export default function Testimonials() {
     setErrorMessage(""); setSuccessMessage("");
     try {
       const body = {
-        coupleName: formData.coupleName,
-        location: formData.location,
-        fullDescription: formData.fullDescription,
+        name: formData.coupleName,
+        role: formData.location,
+        text: formData.fullDescription,
         rating: formData.rating,
         status: "Pending",
         ...(formData.thumbnail?.data ? { thumbnail: formData.thumbnail.data } : {}),

@@ -33,7 +33,9 @@ $routes->resource('slider', ['controller' => 'Slider']);
 $routes->resource('testimonials', ['controller' => 'Testimonials']);
 $routes->resource('love-stories', ['controller' => 'LoveStories']);
 $routes->resource('team', ['controller' => 'Team']);
-$routes->resource('popup', ['controller' => 'Popup']);
+$routes->get('popup', 'Popup::index');
+$routes->put('popup', 'Popup::update');
+$routes->post('popup', 'Popup::update');
 $routes->get('migrate-images', 'MigrateImages::index');
 
 // Routes for root access with /api/ prefix (local dev)
@@ -68,7 +70,9 @@ $routes->group('api', function($routes) {
     $routes->resource('testimonials', ['controller' => 'Testimonials']);
     $routes->resource('love-stories', ['controller' => 'LoveStories']);
     $routes->resource('team', ['controller' => 'Team']);
-    $routes->resource('popup', ['controller' => 'Popup']);
+    $routes->get('popup', 'Popup::index');
+    $routes->put('popup', 'Popup::update');
+    $routes->post('popup', 'Popup::update');
     $routes->get('migrate-images', 'MigrateImages::index');
 });
 

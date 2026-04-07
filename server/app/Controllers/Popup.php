@@ -12,8 +12,16 @@ class Popup extends ResourceController
 
     public function index()
     {
-        // Return active popups first or all
-        return $this->respond($this->model->findAll());
+        $popup = $this->model->find(1);
+        if (!$popup) {
+            $this->model->insert(['id' => 1, 'title' => '', 'content' => '', 'isActive' => false]);
+            $popup = $this->model->find(1);
+        }
+        
+        // Map content to description for frontend compatibility
+        $popup['description'] = $popup['content'] ?? '';
+        
+        return $this->respond($popup);
     }
 
     public function create()
@@ -40,14 +48,23 @@ class Popup extends ResourceController
 
     public function update($id = null)
     {
+        $id = $id ?? 1; // Default to singleton ID 1
         $data = $this->request->getJSON(true);
         helper('image');
-        if (isset($data['image'])) {
+        
+        // Map frontend description back to database content
+        if (isset($data['description'])) {
+            $data['content'] = $data['description'];
+            unset($data['description']);
+        }
+        
+        if (isset($data['image']) && strpos($data['image'], 'data:image') === 0) {
             $oldItem = $this->model->find($id);
             $data['image'] = save_base64_image($data['image'], 'popups', $oldItem['image'] ?? null);
         }
+        
         if ($this->model->update($id, $data)) {
-            return $this->respond($data);
+            return $this->index();
         }
         return $this->fail($this->model->errors());
     }

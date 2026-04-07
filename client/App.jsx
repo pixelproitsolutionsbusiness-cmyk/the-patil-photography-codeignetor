@@ -115,8 +115,8 @@ const ProtectedRoute = ({ children }) => {
 const AdminRedirect = () => {
   const token = localStorage.getItem("token");
   if (token) {
-    // If already logged in, go to dashboard
-    return <Navigate to="/" replace />;
+    // If already logged in, show the AppShell instead of redirecting
+    return <AppShell />;
   }
   // If not logged in, show the Login component
   return <Login />;
@@ -252,7 +252,7 @@ const AppShell = () => {
               <PanelLeft className="h-5 w-5" />
             </button>
             <h2 className="text-xl font-bold text-charcoal-900 tracking-tight capitalize font-playfair">
-              {location.pathname === "/" || location.pathname === "/admin-dashboard" ? "Studio Oversight" : location.pathname.replace("/admin-", "").replace("-", " ")}
+              {location.pathname === "/" || location.pathname === "/admin" || location.pathname === "/admin-dashboard" ? "Studio Oversight" : location.pathname.replace("/admin-", "").replace("-", " ")}
             </h2>
           </div>
 
@@ -303,6 +303,7 @@ const AppShell = () => {
         <main className="flex-1 px-4 pb-10 mt-6 sm:px-6 lg:px-10">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/admin" element={<Dashboard />} />
             <Route path="/admin-dashboard" element={<Dashboard />} />
             <Route path="/admin-common-types" element={<AdminCommonTypes />} />
 

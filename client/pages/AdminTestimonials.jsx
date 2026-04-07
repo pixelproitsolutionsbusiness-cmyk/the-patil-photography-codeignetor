@@ -61,7 +61,13 @@ export default function AdminTestimonials() {
             }
 
             const data = await res.json();
-            const arr = Array.isArray(data) ? data : [];
+            const arr = Array.isArray(data) ? data.map(item => ({
+                ...item,
+                coupleName: item.name || "",
+                location: item.role || "",
+                fullDescription: item.text || "",
+                displayOrder: parseInt(item.order || 0),
+            })) : [];
             // sort by displayOrder so UI reflects current order immediately
             arr.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
             setTestimonials(arr);
@@ -91,6 +97,14 @@ export default function AdminTestimonials() {
         setIsSaving(true);
 
         try {
+            const payload = {
+                ...currentTestimonial,
+                name: currentTestimonial.coupleName,
+                role: currentTestimonial.location,
+                text: currentTestimonial.fullDescription,
+                order: currentTestimonial.displayOrder,
+            };
+
             const url = isEditing && currentTestimonial._id
                 ? `/api/testimonials/${currentTestimonial._id}`
                 : "/api/testimonials";
@@ -100,7 +114,7 @@ export default function AdminTestimonials() {
             const res = await fetch(url, {
                 method: method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(currentTestimonial),
+                body: JSON.stringify(payload),
             });
 
             if (res.ok) {
@@ -177,7 +191,7 @@ export default function AdminTestimonials() {
                 fetch(`/api/testimonials/${u.id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ displayOrder: u.displayOrder }),
+                    body: JSON.stringify({ order: u.displayOrder }),
                 })
             )
         )
