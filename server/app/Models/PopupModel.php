@@ -12,7 +12,7 @@ class PopupModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['title', 'subtitle', 'image', 'link', 'status'];
+    protected $allowedFields    = ['title', 'content', 'subtitle', 'image', 'link', 'status', 'isActive'];
 
     // Dates
     protected $useTimestamps = true;

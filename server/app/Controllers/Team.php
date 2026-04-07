@@ -12,7 +12,7 @@ class Team extends ResourceController
 
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        return $this->respond($this->model->orderBy('order', 'ASC')->findAll());
     }
 
     public function create()

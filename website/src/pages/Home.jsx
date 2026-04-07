@@ -104,7 +104,12 @@ export default function Home() {
 
     fetch("/api/testimonials?type=active")
       .then(r => r.json())
-      .then(d => setTestimonials(Array.isArray(d) ? d : []))
+      .then(d => setTestimonials(Array.isArray(d) ? d.map(item => ({
+          ...item,
+          coupleName: item.name || item.coupleName || "",
+          location: item.role || item.location || "",
+          fullDescription: item.text || item.fullDescription || ""
+      })) : []))
       .catch(() => {})
       .finally(() => setLdTestimonials(false));
 

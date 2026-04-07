@@ -1,5 +1,6 @@
 import "./global.css";
 import "./lib/apiFetch";
+import { getImageUrl } from "./lib/apiFetch";
 import React, { useEffect, useState } from "react";
 import { Menu, Instagram, Facebook, Youtube, Twitter, Linkedin, Link as LinkIcon, User, Key, LogOut, Radio, RefreshCcw, Mail, PanelLeft, MessageCircle, Globe } from "lucide-react";
 import {
@@ -104,6 +105,7 @@ const useAutoLogout = (logoutCallback) => {
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   if (!token) {
+    // Navigate to admin root (Login) if not authenticated
     return <Navigate to="/admin" replace />;
   }
   return children;
@@ -113,8 +115,8 @@ const ProtectedRoute = ({ children }) => {
 const AdminRedirect = () => {
   const token = localStorage.getItem("token");
   if (token) {
-    // If already logged in, go to dashboard
-    return <Navigate to="/" replace />;
+    // If already logged in, show the AppShell instead of redirecting
+    return <AppShell />;
   }
   // If not logged in, show the Login component
   return <Login />;
@@ -129,6 +131,7 @@ const App = () => (
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Navigate to="/admin" replace />} />
+          <Route path="/admin/" element={<AdminRedirect />} />
           <Route path="/admin" element={<AdminRedirect />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
@@ -166,7 +169,7 @@ const AppShell = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("rememberMe");
-    navigate("/admin");
+    window.location.href = "/admin"; // Force reload to clear all states and routes
   };
 
   useAutoLogout(handleLogout);
@@ -190,7 +193,7 @@ const AppShell = () => {
         document.title = settings.businessName + " | Admin Console";
       }
       // Use secondary logo for favicon, fallback to primary logo
-      const faviconUrl = settings.secondaryLogo || settings.primaryLogo;
+      const faviconUrl = getImageUrl(settings.secondaryLogo || settings.primaryLogo);
       if (faviconUrl) {
         if (window.setFavicon) {
           window.setFavicon(faviconUrl);
@@ -249,7 +252,7 @@ const AppShell = () => {
               <PanelLeft className="h-5 w-5" />
             </button>
             <h2 className="text-xl font-bold text-charcoal-900 tracking-tight capitalize font-playfair">
-              {location.pathname === "/" || location.pathname === "/admin-dashboard" ? "Studio Oversight" : location.pathname.replace("/admin-", "").replace("-", " ")}
+              {location.pathname === "/" || location.pathname === "/admin" || location.pathname === "/admin-dashboard" ? "Studio Oversight" : location.pathname.replace("/admin-", "").replace("-", " ")}
             </h2>
           </div>
 
@@ -300,6 +303,7 @@ const AppShell = () => {
         <main className="flex-1 px-4 pb-10 mt-6 sm:px-6 lg:px-10">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/admin" element={<Dashboard />} />
             <Route path="/admin-dashboard" element={<Dashboard />} />
             <Route path="/admin-common-types" element={<AdminCommonTypes />} />
 

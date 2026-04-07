@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 import { useSettings } from "../hooks/useSettings";
+import { getImageUrl } from "../lib/apiFetch";
 
 const Login = () => {
   const { data: settings } = useSettings();
@@ -54,7 +55,7 @@ const Login = () => {
       <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-gold-600 to-gold-700 text-white py-3 px-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <h2 className="text-sm font-semibold">🔐 Admin Studio Console</h2>
-          <a href="/" className="text-sm hover:opacity-90 transition">← Back to Website</a>
+          <a href="/" className="text-sm hover:opacity-90 transition" onClick={(e) => { e.preventDefault(); window.location.href = "/"; }}>← Back to Website</a>
         </div>
       </div>
 
@@ -175,8 +176,8 @@ const Login = () => {
           className="hidden lg:flex relative p-8 items-center justify-center overflow-hidden order-first lg:order-first bg-cover bg-center loginBG"
           style={{
             backgroundImage: settings?.backgroundImage
-              ? `url('${settings.backgroundImage}')`
-              : "url('/assets/img/default-bg.jpg')",
+              ? `url('${getImageUrl(settings.backgroundImage)}')`
+              : `url('${getImageUrl("/assets/img/default-bg.jpg")}')`,
           }}
         >
           <div className="absolute inset-0 bg-black opacity-40" />
@@ -187,7 +188,7 @@ const Login = () => {
             <div className="mb-8">
               {settings?.primaryLogo ? (
                 <img
-                  src={settings.primaryLogo}
+                  src={getImageUrl(settings.primaryLogo)}
                   alt={`${settings.businessName || "Logo"}`}
                   className="w-40 h-40 object-contain drop-shadow-xl rounded-md bg-white/10 p-2"
                 />

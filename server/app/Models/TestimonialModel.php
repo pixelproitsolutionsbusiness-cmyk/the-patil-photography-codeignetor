@@ -12,7 +12,7 @@ class TestimonialModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'role', 'text', 'rating', 'status', 'order'];
+    protected $allowedFields    = ['name', 'role', 'text', 'rating', 'status', 'order', 'thumbnail'];
 
     // Dates
     protected $useTimestamps = true;

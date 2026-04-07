@@ -12,6 +12,7 @@ if (!function_exists('save_base64_image')) {
     function save_base64_image($base64String, $folder = 'general', $oldFile = null) {
         // Only process if it looks like a base64 image data URI
         if ($base64String && is_string($base64String) && preg_match('/^data:image\/(\w+);base64,/', $base64String, $type)) {
+            $extension = strtolower($type[1]); // e.g., png, jpeg, webp
             $data = substr($base64String, strpos($base64String, ',') + 1);
             $decodedData = base64_decode($data);
             if ($decodedData === false) {
@@ -30,31 +31,46 @@ if (!function_exists('save_base64_image')) {
                 mkdir($targetDir, 0755, true);
             }
 
-            // Create unique filename ALWAYS as JPG
-            $fileName = $folder . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.jpg';
+            // Create unique filename with correct extension
+            $fileName = $folder . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . ($extension === 'jpeg' ? 'jpg' : $extension);
             $fullPath = $targetDir . '/' . $fileName;
 
-            // Save as JPEG (Quality: 85)
-            // If transparent PNG, background will be white by default usually?
-            // To be safer, create white background if needed
-            $width = imagesx($img);
-            $height = imagesy($img);
-            $outputImg = imagecreatetruecolor($width, $height);
-            $white = imagecolorallocate($outputImg, 255, 255, 255);
-            imagefill($outputImg, 0, 0, $white);
-            imagecopy($outputImg, $img, 0, 0, 0, 0, $width, $height);
+            $success = false;
+            
+            // For PNG and WEBP, we want to preserve transparency
+            if ($extension === 'png' || $extension === 'webp') {
+                imagealphablending($img, false);
+                imagesavealpha($img, true);
+                
+                if ($extension === 'png') {
+                    $success = imagepng($img, $fullPath, 9); // Compression 0-9
+                } else {
+                    $success = imagewebp($img, $fullPath, 85);
+                }
+            } else {
+                // For other types (like JPEG), or if forced to JPEG
+                // If it was originally a PNG but we save as JPEG, we should fill with white or keep as is?
+                // The previous code always converted to JPEG with white background.
+                // Let's stick to original format if possible.
+                
+                if ($extension === 'jpeg' || $extension === 'jpg') {
+                    $success = imagejpeg($img, $fullPath, 85);
+                } else {
+                    // Fallback to PNG if unknown but valid image
+                    $success = imagepng($img, $fullPath);
+                }
+            }
 
-            if (imagejpeg($outputImg, $fullPath, 85)) {
+            if ($success) {
                 imagedestroy($img);
-                imagedestroy($outputImg);
 
                 // Delete old file if provided and different
                 if ($oldFile && !empty($oldFile) && is_string($oldFile)) {
                     $relativePath = 'uploads/' . $folder . '/' . $fileName;
                     if ($oldFile !== $relativePath) {
-                        $oldFullPath = FCPATH . $oldFile;
+                        $oldFullPath = FCPATH . ltrim($oldFile, '/');
                         if (is_file($oldFullPath)) {
-                            unlink($oldFullPath);
+                            @unlink($oldFullPath);
                         }
                     }
                 }
@@ -62,7 +78,6 @@ if (!function_exists('save_base64_image')) {
             }
             
             imagedestroy($img);
-            imagedestroy($outputImg);
         }
         return $base64String;
     }
