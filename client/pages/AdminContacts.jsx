@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Trash2, MessageSquare, Mail, AlertCircle, CheckCircle2, Eye, X, User, Settings, Globe, Phone, MapPin, Users, FileText, ShoppingCart, MessageCircle, Zap } from "lucide-react";
 import { formatDate } from "../lib/dateFormatter";
+import { getImageUrl } from "../lib/apiFetch";
 import PageHeader from "../components/PageHeader";
-import { useConfirm } from "@/components/ConfirmModal";
+import { useConfirm } from "../components/ConfirmModal";
 import {
   Select,
   SelectContent,
@@ -156,8 +157,6 @@ export default function AdminContacts() {
 
     // Filter messages
     const filteredMessages = filter === 'All' ? messages : messages.filter(m => m.status === filter);
-
-    // --- insert ConfirmDialog just before return closure ---
 
     // Get status badge colors
     const getStatusBadgeColor = (status) => {
@@ -317,9 +316,6 @@ export default function AdminContacts() {
                                             <h3 className="text-lg font-semibold text-charcoal-900 truncate">
                                                 {msg.subject}
                                             </h3>
-                                            {/* <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeColor(msg.status)}`}>
-                                                {msg.status}
-                                            </span> */}
                                         </div>
                                         <div className="flex flex-wrap items-center text-sm text-gray-600 gap-3">
                                             <span className="flex items-center gap-1">

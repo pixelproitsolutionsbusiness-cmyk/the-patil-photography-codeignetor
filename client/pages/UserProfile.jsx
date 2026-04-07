@@ -12,6 +12,7 @@ import {
   MessageCircle,
   ExternalLink,
 } from "lucide-react";
+import { getImageUrl } from "../lib/apiFetch";
 
 export default function UserProfile() {
   const [loading, setLoading] = useState(true);
@@ -74,8 +75,8 @@ export default function UserProfile() {
         {settings?.primaryLogo && (
           <div className="absolute top-6 left-6 md:top-8 md:left-8 z-10">
             <img
-              src={settings.primaryLogo}
-              alt="Studio Logo"
+               src={getImageUrl(settings.primaryLogo)}
+               alt="Studio Logo"
               className="w-36 h-36 object-contain drop-shadow-xl rounded-md bg-white/10 p-2"
             />
           </div>
