@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useSettings } from "../hooks/useSettings";
 import { LogOut } from "lucide-react";
+import { getImageUrl } from "../lib/apiFetch";
 
 const items = [
   { to: "/admin-dashboard", label: "Dashboard" },

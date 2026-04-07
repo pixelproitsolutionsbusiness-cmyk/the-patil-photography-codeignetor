@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { getImageUrl } from "../lib/apiFetch";
 import ClientForm from "@/components/ClientForm";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, Users } from "lucide-react";
-import { useConfirm } from "@/components/ConfirmModal";
+import { useConfirm } from "../components/ConfirmModal";
 
 export default function Clients() {
   const [clients, setClients] = useState([]);

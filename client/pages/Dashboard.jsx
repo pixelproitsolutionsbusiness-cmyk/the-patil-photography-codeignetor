@@ -21,6 +21,7 @@ import {
   BarChart as BarChartIcon,
   Activity
 } from "lucide-react";
+import { getImageUrl } from "../lib/apiFetch";
 import {
   BarChart,
   Bar,
@@ -524,7 +525,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
                   <img
-                    src={selectedTestimonial.thumbnail || "https://placehold.co/250x250?text=Couple"}
+                    src={getImageUrl(selectedTestimonial.thumbnail)}
                     alt={selectedTestimonial.coupleName}
                     className="h-full w-full object-cover"
                   />
