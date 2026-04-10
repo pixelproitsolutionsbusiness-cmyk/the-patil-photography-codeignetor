@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Video, PlayCircle, AlertCircle, Search, Filter } from "lucide-react";
 import PageHeader from "../components/PageHeader";
@@ -17,7 +18,6 @@ export default function AdminFilms() {
     const [form, setForm] = useState({ id: null, title: "", videoUrl: "", category: "Wedding", status: "Active" });
     const [deleteId, setDeleteId] = useState(null);
     const [showSuccess, setShowSuccess] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
 
     // Search and filter states
     const [searchTerm, setSearchTerm] = useState("");
@@ -64,12 +64,10 @@ export default function AdminFilms() {
             setTimeout(() => setShowSuccess(false), 3000);
         },
         onError: (err) => toast.error(err.message),
-        onSettled: () => setIsSaving(false),
     });
 
     const handleSave = () => {
-        if (isSaving) return;
-        setIsSaving(true);
+        if (mutation.isPending) return;
         // send field under youtubeUrl for backward compatibility
         mutation.mutate({ ...form, youtubeUrl: form.videoUrl });
     };
@@ -289,7 +287,7 @@ export default function AdminFilms() {
 
             {/* Modal */}
             {modalOpen && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setModalOpen(false)}>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-40 p-4" onClick={() => setModalOpen(false)}>
                     <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl animate-in fade-in zoom-in duration-200" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-gray-900">{form.id ? "Edit Film" : "New Film"}</h2>
@@ -329,7 +327,10 @@ export default function AdminFilms() {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category</label>
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <label className="text-sm font-semibold text-gray-700">Category</label>
+                                        <Link to="/admin-common-types" className="text-[10px] text-blue-600 hover:text-blue-700 font-bold uppercase hover:underline">Manage</Link>
+                                    </div>
                                     <Select
                                         value={form.category}
                                         onValueChange={(value) => setForm({ ...form, category: value })}
@@ -367,8 +368,8 @@ export default function AdminFilms() {
 
                         <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <button onClick={() => setModalOpen(false)} className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
-                            <button onClick={handleSave} disabled={isSaving} className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors shadow-md disabled:bg-gray-400">
-                                {isSaving ? "Saving..." : (form.id ? "Update Film" : "Create Film")}
+                            <button onClick={handleSave} disabled={mutation.isPending} className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors shadow-md disabled:bg-gray-400">
+                                {mutation.isPending ? "Saving..." : (form.id ? "Update Film" : "Create Film")}
                             </button>
                         </div>
                     </div>

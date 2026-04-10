@@ -19,8 +19,9 @@ class GalleryModel extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-    protected $allowCallbacks = true;
-    protected $afterFind      = ['formatId'];
+    protected $beforeInsert   = ['encodeImages'];
+    protected $beforeUpdate   = ['encodeImages'];
+    protected $afterFind      = ['formatId', 'decodeImages'];
 
     protected function formatId(array $data)
     {
@@ -36,6 +37,34 @@ class GalleryModel extends Model
                     $row['_id'] = $row['id'];
                 }
             }
+        }
+        return $data;
+    }
+
+    protected function decodeImages(array $data)
+    {
+        if (isset($data['data'])) {
+            if (isset($data['singleton']) && $data['singleton']) {
+                $image = $data['data']['image'] ?? null;
+                if (is_string($image) && strpos($image, '~%~') !== false) {
+                    $data['data']['image'] = explode('~%~', $image);
+                }
+            } else {
+                foreach ($data['data'] as &$row) {
+                    $image = $row['image'] ?? null;
+                    if (is_string($image) && strpos($image, '~%~') !== false) {
+                        $row['image'] = explode('~%~', $image);
+                    }
+                }
+            }
+        }
+        return $data;
+    }
+
+    protected function encodeImages(array $data)
+    {
+        if (isset($data['data']['image']) && is_array($data['data']['image'])) {
+            $data['data']['image'] = implode('~%~', $data['data']['image']);
         }
         return $data;
     }

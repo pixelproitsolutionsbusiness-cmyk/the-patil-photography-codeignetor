@@ -33,7 +33,7 @@ const validatePhone = (phone) => {
 const validateMobileNumber = (mobile) => {
     if (!mobile) return true; // Optional field
     // Allow + at start, then digits, spaces, dashes. Minimal length 10.
-    const clean = mobile.replace(/[^0-9+]/g, '');
+    const clean = mobile.replace(/[^0-9]/g, '');
     return clean.length >= 10 && clean.length <= 15;
 };
 
@@ -286,7 +286,7 @@ export default function AdminSettings() {
                                             type="text"
                                             value={formData.primaryMobileNumber}
                                             onChange={(e) => handleMobileNumberInput('primaryMobileNumber', e.target.value)}
-                                            maxLength={10}
+                                            maxLength={15}
                                             className={`w-full pl-9 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500/20 outline-none transition-all ${errors.primaryMobileNumber ? 'border-red-500' : 'border-gray-200'}`}
                                             placeholder="9876543210"
                                         />
@@ -301,7 +301,7 @@ export default function AdminSettings() {
                                             type="text"
                                             value={formData.secondaryMobileNumber}
                                             onChange={(e) => handleMobileNumberInput('secondaryMobileNumber', e.target.value)}
-                                            maxLength={10}
+                                            maxLength={15}
                                             className={`w-full pl-9 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-gold-500/20 outline-none transition-all ${errors.secondaryMobileNumber ? 'border-red-500' : 'border-gray-200'}`}
                                             placeholder="9876543210"
                                         />

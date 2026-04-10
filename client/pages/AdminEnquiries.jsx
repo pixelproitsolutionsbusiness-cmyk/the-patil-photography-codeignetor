@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { formatDate } from "../lib/dateFormatter";
 import { Trash2, Phone, MapPin, Calendar, Zap, Eye, X, MessageCircle, Search } from "lucide-react";
 import PageHeader from "../components/PageHeader";
@@ -12,54 +14,62 @@ import {
 } from "@/components/ui/select";
 
 export default function AdminEnquiries() {
-    const [enquiries, setEnquiries] = useState([]);
+    const queryClient = useQueryClient();
     const [viewDetails, setViewDetails] = useState(null);
     const [filter, setFilter] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
-    const { confirm, ConfirmDialog } = useConfirm();
 
-    useEffect(() => {
-        fetchEnquiries();
-    }, []);
-
-    const fetchEnquiries = async () => {
-        try {
+    const { data: enquiries = [], isLoading } = useQuery({
+        queryKey: ["enquiries"],
+        queryFn: async () => {
             const res = await fetch("/api/enquiries");
-            const data = await res.json();
-            setEnquiries(Array.isArray(data) ? data : []);
-        } catch (error) {
-            console.error("Error fetching enquiries:", error);
-        }
-    };
+            if (!res.ok) throw new Error("Failed to fetch enquiries");
+            return res.json();
+        },
+    });
 
-    const updateStatus = async (id, status) => {
-        try {
-            const res = await fetch(`/api/enquiries/${id}/status`, {
+    const mutation = useMutation({
+        mutationFn: async ({ id, status }) => {
+            const res = await fetch(`/api/enquiries/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status }),
             });
-            if (res.ok) {
-                setEnquiries(prev => prev.map(e => e._id === id ? { ...e, status } : e));
-                if (viewDetails?._id === id) {
-                    setViewDetails({...viewDetails, status});
-                }
-            }
-        } catch (error) {
-            console.error("Error updating status:", error);
-        }
+            if (!res.ok) throw new Error("Failed to update status");
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["enquiries"] });
+            toast.success("Status updated");
+        },
+    });
+
+    const updateStatus = (id, status) => {
+        mutation.mutate({ id, status });
     };
 
-    const handleDelete = async (id) => {
-        const ok = await confirm({
+    const { confirm, ConfirmDialog } = useConfirm();
+
+    const deleteMutation = useMutation({
+        mutationFn: async (id) => {
+            const res = await fetch(`/api/enquiries/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete enquiry");
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["enquiries"] });
+            toast.success("Enquiry deleted");
+            if (viewDetails) setViewDetails(null);
+        },
+        onError: (err) => toast.error(err.message),
+    });
+
+    const handleDelete = (id) => {
+        confirm({
             title: "Delete Enquiry?",
             message: "Are you sure you want to delete this enquiry?",
+        }).then(ok => {
+            if (ok) deleteMutation.mutate(id);
         });
-        if (!ok) return;
-
-        await fetch(`/api/enquiries/${id}`, { method: "DELETE" });
-        if (viewDetails?._id === id) setViewDetails(null);
-        fetchEnquiries();
     };
 
     const getStatusColor = (status) => {
@@ -176,7 +186,12 @@ export default function AdminEnquiries() {
             </div>
 
             {/* Enquiries Table/Grid */}
-            {filteredEnquiries.length === 0 ? (
+            {isLoading ? (
+                <div className="text-center py-16">
+                    <div className="w-8 h-8 border-4 border-gold-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-slate-500">Loading enquiries...</p>
+                </div>
+            ) : filteredEnquiries.length === 0 ? (
                 <div className="text-center py-16 bg-charcoal-50 rounded-lg border border-gold-200">
                     <MessageCircle className="mx-auto h-12 w-12 text-gold-400 mb-3" />
                     <p className="text-charcoal-700 font-medium">No enquiries found</p>

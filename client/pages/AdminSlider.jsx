@@ -70,7 +70,7 @@ export default function AdminSlider() {
   });
 
   // Local helper state derived from mutation and form
-  const isSaving = mutation.isLoading;
+  const isSaving = mutation.isPending;
   const editingId = form.id;
 
   const handleSave = () => {

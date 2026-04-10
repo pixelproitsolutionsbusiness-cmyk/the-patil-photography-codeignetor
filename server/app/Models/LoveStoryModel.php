@@ -21,7 +21,8 @@ class LoveStoryModel extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-    protected $allowCallbacks = true;
+    protected $beforeInsert   = ['encodeGallery'];
+    protected $beforeUpdate   = ['encodeGallery'];
     protected $afterFind      = ['formatId', 'decodeGallery'];
 
     protected function formatId(array $data)
@@ -59,13 +60,40 @@ class LoveStoryModel extends Model
         if (isset($data['data'])) {
             if (isset($data['singleton']) && $data['singleton']) {
                 $gallery = $data['data']['gallery'] ?? null;
-                $data['data']['gallery'] = is_string($gallery) ? (json_decode($gallery, true) ?: []) : (is_array($gallery) ? $gallery : []);
+                if (is_string($gallery)) {
+                    if (strpos($gallery, '~%~') !== false) {
+                        $data['data']['gallery'] = explode('~%~', $gallery);
+                    } else {
+                        // try json decode
+                        $decoded = json_decode($gallery, true);
+                        $data['data']['gallery'] = is_array($decoded) ? $decoded : [$gallery];
+                    }
+                } else {
+                    $data['data']['gallery'] = is_array($gallery) ? $gallery : [];
+                }
             } else {
                 foreach ($data['data'] as &$row) {
                     $gallery = $row['gallery'] ?? null;
-                    $row['gallery'] = is_string($gallery) ? (json_decode($gallery, true) ?: []) : (is_array($gallery) ? $gallery : []);
+                    if (is_string($gallery)) {
+                        if (strpos($gallery, '~%~') !== false) {
+                            $row['gallery'] = explode('~%~', $gallery);
+                        } else {
+                            $decoded = json_decode($gallery, true);
+                            $row['gallery'] = is_array($decoded) ? $decoded : [$gallery];
+                        }
+                    } else {
+                        $row['gallery'] = is_array($gallery) ? $gallery : [];
+                    }
                 }
             }
+        }
+        return $data;
+    }
+
+    protected function encodeGallery(array $data)
+    {
+        if (isset($data['data']['gallery']) && is_array($data['data']['gallery'])) {
+            $data['data']['gallery'] = implode('~%~', $data['data']['gallery']);
         }
         return $data;
     }

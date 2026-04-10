@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Trash2, MessageSquare, Mail, AlertCircle, CheckCircle2, Eye, X, User, Settings, Globe, Phone, MapPin, Users, FileText, ShoppingCart, MessageCircle, Zap } from "lucide-react";
 import { formatDate } from "../lib/dateFormatter";
 import { getImageUrl } from "../lib/apiFetch";
@@ -13,34 +15,13 @@ import {
 } from "@/components/ui/select";
 
 export default function AdminContacts() {
-    const [messages, setMessages] = useState([]);
+    const queryClient = useQueryClient();
     const [filter, setFilter] = useState('All');
     const [viewDetails, setViewDetails] = useState(null);
-    const [userData, setUserData] = useState(null);
-    const [globalSettings, setGlobalSettings] = useState(null);
-    const [loading, setLoading] = useState(true);
-    
-    // Dynamic data from all components
-    const [dashboardData, setDashboardData] = useState({
-        orders: [],
-        enquiries: [],
-        invoices: [],
-        clients: [],
-        users: [],
-        contacts: []
-    });
 
-    const { confirm, ConfirmDialog } = useConfirm();
-
-    useEffect(() => {
-        fetchAllData();
-    }, []);
-
-    const fetchAllData = async () => {
-        try {
-            setLoading(true);
-            
-            // Fetch from all admin components
+    const { data: dashboardData, isLoading } = useQuery({
+        queryKey: ["adminDashboardData"],
+        queryFn: async () => {
             const [contactRes, userRes, settingsRes, ordersRes, enquiriesRes, invoicesRes, clientsRes, usersRes] = await Promise.all([
                 fetch("/api/contacts"),
                 fetch("/api/users/me"),
@@ -52,79 +33,74 @@ export default function AdminContacts() {
                 fetch("/api/users").catch(() => ({ ok: false, json: () => [] }))
             ]);
 
-            const msgData = await contactRes.json();
-            setMessages(Array.isArray(msgData) ? msgData : []);
-
-            if (userRes.ok) {
-                const userData = await userRes.json();
-                setUserData(userData);
-            }
-
-            if (settingsRes.ok) {
-                const settingsData = await settingsRes.json();
-                setGlobalSettings(settingsData);
-            }
-
-            // Get data from other components
+            const msgData = contactRes.ok ? await contactRes.json() : [];
+            const userData = userRes.ok ? await userRes.json() : null;
+            const settingsData = settingsRes.ok ? await settingsRes.json() : null;
             const ordersData = ordersRes.ok ? await ordersRes.json() : [];
             const enquiriesData = enquiriesRes.ok ? await enquiriesRes.json() : [];
             const invoicesData = invoicesRes.ok ? await invoicesRes.json() : [];
             const clientsData = clientsRes.ok ? await clientsRes.json() : [];
             const usersData = usersRes.ok ? await usersRes.json() : [];
 
-            setDashboardData({
+            return {
+                contacts: Array.isArray(msgData) ? msgData : [],
+                userData,
+                globalSettings: settingsData,
                 orders: Array.isArray(ordersData) ? ordersData : [],
                 enquiries: Array.isArray(enquiriesData) ? enquiriesData : [],
                 invoices: Array.isArray(invoicesData) ? invoicesData : [],
                 clients: Array.isArray(clientsData) ? clientsData : [],
-                users: Array.isArray(usersData) ? usersData : [],
-                contacts: Array.isArray(msgData) ? msgData : []
-            });
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+                users: Array.isArray(usersData) ? usersData : []
+            };
+        },
+    });
 
-    const fetchMessages = async () => {
-        try {
-            const res = await fetch("/api/contacts");
-            const data = await res.json();
-            setMessages(Array.isArray(data) ? data : []);
-        } catch (error) {
-            console.error("Error fetching messages:", error);
-        }
-    };
+    const messages = dashboardData?.contacts || [];
+    const userData = dashboardData?.userData;
+    const globalSettings = dashboardData?.globalSettings;
 
-    const updateStatus = async (id, status) => {
-        try {
-            const res = await fetch(`/api/contacts/${id}/status`, {
+    const { confirm, ConfirmDialog } = useConfirm();
+
+    const mutation = useMutation({
+        mutationFn: async ({ id, status }) => {
+            const res = await fetch(`/api/contacts/${id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status }),
             });
-            if (res.ok) {
-                fetchMessages();
-                if (viewDetails?._id === id) {
-                    setViewDetails({...viewDetails, status});
-                }
-            }
-        } catch (error) {
-            console.error("Error updating status:", error);
-        }
+            if (!res.ok) throw new Error("Failed to update status");
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["adminDashboardData"] });
+            toast.success("Status updated");
+        },
+    });
+
+    const updateStatus = (id, status) => {
+        mutation.mutate({ id, status });
     };
 
-    const handleDelete = async (id) => {
-        const ok = await confirm({
+    const deleteMutation = useMutation({
+        mutationFn: async (id) => {
+            const res = await fetch(`/api/contacts/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete message");
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["adminDashboardData"] });
+            toast.success("Message deleted");
+            if (viewDetails) setViewDetails(null);
+        },
+        onError: (err) => toast.error(err.message),
+    });
+
+    const handleDelete = (id) => {
+        confirm({
             title: "Delete Message?",
             message: "Are you sure you want to delete this message?",
+        }).then(ok => {
+            if (ok) deleteMutation.mutate(id);
         });
-        if (!ok) return;
-
-        await fetch(`/api/contacts/${id}`, { method: "DELETE" });
-        if (viewDetails?._id === id) setViewDetails(null);
-        fetchMessages();
     };
 
     // Calculate stats from all components
@@ -300,7 +276,12 @@ export default function AdminContacts() {
 
                 {/* Messages List */}
                 <div className="space-y-3">
-                    {filteredMessages.length === 0 ? (
+                    {isLoading ? (
+                        <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-200">
+                             <div className="w-8 h-8 border-4 border-gold-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                             <p className="text-slate-500">Loading messages...</p>
+                        </div>
+                    ) : filteredMessages.length === 0 ? (
                         <div className="text-center py-16 bg-charcoal-50 rounded-lg border border-gold-200">
                             <MessageSquare className="mx-auto h-12 w-12 text-gold-400 mb-3" />
                             <p className="text-charcoal-700 font-medium">No {filter !== 'All' ? filter.toLowerCase() : ''} messages yet.</p>

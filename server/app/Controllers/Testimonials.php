@@ -59,9 +59,14 @@ class Testimonials extends ResourceController
 
     public function delete($id = null)
     {
-        if ($this->model->delete($id)) {
+        $item = $this->model->find($id);
+        if ($item && $this->model->delete($id)) {
+            helper('image');
+            if (!empty($item['thumbnail'])) {
+                delete_image($item['thumbnail']);
+            }
             return $this->respondDeleted(['id' => $id]);
         }
-        return $this->fail($this->model->errors());
+        return $this->fail($this->model->errors() ?: 'Item not found');
     }
 }

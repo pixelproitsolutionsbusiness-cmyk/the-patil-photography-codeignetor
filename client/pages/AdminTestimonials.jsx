@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { formatDate } from "../lib/dateFormatter";
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Trash2, Edit2, Plus, GripVertical, Star, AlertCircle, Search, ToggleLeft, ToggleRight, X, ArrowUp, ArrowDown } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -9,21 +9,21 @@ import { useConfirm } from "../components/ConfirmModal";
 import { getImageUrl } from "../lib/apiFetch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+const formatDate = (dateString) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    });
+};
+
 export default function AdminTestimonials() {
-    const [testimonials, setTestimonials] = useState([]);
+    const queryClient = useQueryClient();
+    const { confirm, ConfirmDialog } = useConfirm();
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const { confirm, ConfirmDialog } = useConfirm();
-
-    // derive sorted list by displayOrder (ascending)
-    const sortedTestimonials = React.useMemo(() => {
-        return [...testimonials].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-    }, [testimonials]);
-
     const [currentTestimonial, setCurrentTestimonial] = useState({
         coupleName: "",
         location: "",
@@ -34,50 +34,25 @@ export default function AdminTestimonials() {
         status: "Active"
     });
 
-    useEffect(() => {
-        fetchTestimonials();
-    }, []);
-
-    const fetchTestimonials = async () => {
-        setLoading(true);
-        try {
+    const { data: testimonials = [], isLoading } = useQuery({
+        queryKey: ["testimonials"],
+        queryFn: async () => {
             const res = await fetch("/api/testimonials");
-
-            // Check content type before parsing
-            const contentType = res.headers.get("content-type");
-            if (contentType && contentType.includes("text/html")) {
-                console.error("API returned HTML instead of JSON. Server restart required.");
-                alert("⚠️ Backend Update Required\n\nThe new Reviews & Feedback API is not loaded yet.\n\nPlease go to your terminal, STOP the server (Ctrl+C), and START it again (npm run dev).");
-                return;
-            }
-
-            if (!res.ok) {
-                if (res.status === 404) {
-                    alert("API endpoint not found. Please restart your server.");
-                } else {
-                    console.error("Server error:", res.status);
-                }
-                setLoading(false);
-                return;
-            }
-
+            if (!res.ok) throw new Error("Failed to fetch testimonials");
             const data = await res.json();
-            const arr = Array.isArray(data) ? data.map(item => ({
+            return Array.isArray(data) ? data.map(item => ({
                 ...item,
                 coupleName: item.name || "",
                 location: item.role || "",
                 fullDescription: item.text || "",
                 displayOrder: parseInt(item.order || 0),
             })) : [];
-            // sort by displayOrder so UI reflects current order immediately
-            arr.sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
-            setTestimonials(arr);
-        } catch (error) {
-            console.error("Error fetching reviews:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        },
+    });
+
+    const sortedTestimonials = React.useMemo(() => {
+        return [...testimonials].sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
+    }, [testimonials]);
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
@@ -92,20 +67,8 @@ export default function AdminTestimonials() {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (isSaving) return;
-        setIsSaving(true);
-
-        try {
-            const payload = {
-                ...currentTestimonial,
-                name: currentTestimonial.coupleName,
-                role: currentTestimonial.location,
-                text: currentTestimonial.fullDescription,
-                order: currentTestimonial.displayOrder,
-            };
-
+    const mutation = useMutation({
+        mutationFn: async (payload) => {
             const url = isEditing && currentTestimonial._id
                 ? `/api/testimonials/${currentTestimonial._id}`
                 : "/api/testimonials";
@@ -118,31 +81,54 @@ export default function AdminTestimonials() {
                 body: JSON.stringify(payload),
             });
 
-            if (res.ok) {
-                setShowModal(false);
-                resetForm();
-                fetchTestimonials();
-            } else {
+            if (!res.ok) {
                 const errorData = await res.json();
-                alert(`Error saving review: ${errorData.message}`);
+                throw new Error(errorData.message || "Failed to save review");
             }
-        } catch (error) {
-            console.error("Error saving review:", error);
-            alert("Network error. Please try again.");
-        } finally {
-            setIsSaving(false);
-        }
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+            setShowModal(false);
+            resetForm();
+            toast.success("Review saved successfully");
+        },
+        onError: (err) => toast.error(err.message),
+    });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+            ...currentTestimonial,
+            name: currentTestimonial.coupleName,
+            role: currentTestimonial.location,
+            text: currentTestimonial.fullDescription,
+            order: currentTestimonial.displayOrder,
+        };
+        mutation.mutate(payload);
     };
 
-    const handleDelete = async (id) => {
-        const ok = await confirm({
+    const isSaving = mutation.isPending;
+
+    const deleteMutation = useMutation({
+        mutationFn: async (id) => {
+            const res = await fetch(`/api/testimonials/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Failed to delete review");
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+            toast.success("Review deleted");
+        },
+        onError: (err) => toast.error(err.message),
+    });
+
+    const handleDelete = (id) => {
+        confirm({
             title: "Delete Review?",
             message: "Are you sure you want to delete this review?",
+        }).then(ok => {
+            if (ok) deleteMutation.mutate(id);
         });
-        if (!ok) return;
-
-        await fetch(`/api/testimonials/${id}`, { method: "DELETE" });
-        fetchTestimonials();
     };
 
     const handleEdit = (t) => {
@@ -159,7 +145,7 @@ export default function AdminTestimonials() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: newStatus }),
             });
-            fetchTestimonials();
+            queryClient.invalidateQueries({ queryKey: ["testimonials"] });
         } catch (error) {
             console.error("Error updating status:", error);
         }
@@ -201,7 +187,7 @@ export default function AdminTestimonials() {
             })
             .catch((err) => {
                 console.error(err);
-                fetchTestimonials();
+                queryClient.invalidateQueries({ queryKey: ["testimonials"] });
                 toast.error("Failed to update order");
             });
     };
@@ -253,7 +239,7 @@ export default function AdminTestimonials() {
                 />
             </div>
 
-            {loading ? (
+            {isLoading ? (
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                     {/* Mobile Card View */}
                     <div className="block md:hidden">
@@ -510,7 +496,7 @@ export default function AdminTestimonials() {
             )}
 
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowModal(false)}>
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-40 p-4" onClick={() => setShowModal(false)}>
                     <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
                         <div className="sticky top-0 bg-white px-6 py-4 border-b border-slate-100 flex justify-between items-center z-10">
                             <h2 className="text-xl font-bold text-charcoal-900">
@@ -645,7 +631,7 @@ export default function AdminTestimonials() {
                                     type="submit"
                                     className="px-5 py-2.5 bg-charcoal-900 text-white rounded-xl hover:bg-charcoal-800 font-medium transition shadow-sm"
                                 >
-                                    {isSaving ? "Saving..." : (isEditing ? "Update Testimonial" : "Create Testimonial")}
+                                    {isLoading ? "Saving..." : (isEditing ? "Update Testimonial" : "Create Testimonial")}
                                 </button>
                             </div>
                         </form>

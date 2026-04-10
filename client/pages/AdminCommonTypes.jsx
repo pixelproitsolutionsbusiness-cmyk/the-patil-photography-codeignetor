@@ -81,7 +81,10 @@ export default function AdminCommonTypes() {
 
     const handleAddNew = () => {
         setEditingItem(null);
-        setFormData(activeTab === "event-types" ? { name: "" } : { name: "", ratePerDay: 0, category: "photography" });
+        setFormData(activeTab === "event-types" 
+            ? { name: "", label: "", isActive: true } 
+            : { name: "", ratePerDay: 0, category: "photography" }
+        );
         setIsModalOpen(true);
     };
 
@@ -162,6 +165,8 @@ export default function AdminCommonTypes() {
                         <thead className="bg-gray-50 dark:bg-charcoal-900 text-gray-600 dark:text-gray-400 text-xs uppercase font-semibold">
                             <tr>
                                 <th className="px-6 py-4">Name</th>
+                                {activeTab === "event-types" && <th className="px-6 py-4">Display Label</th>}
+                                {activeTab === "event-types" && <th className="px-6 py-4">Status</th>}
                                 {activeTab === "services" && <th className="px-6 py-4">Rate (₹)</th>}
                                 {activeTab === "services" && <th className="px-6 py-4">Category</th>}
                                 <th className="px-6 py-4 text-right">Actions</th>
@@ -173,6 +178,18 @@ export default function AdminCommonTypes() {
                                     <td className="px-6 py-4 font-medium text-charcoal-900 dark:text-white">
                                         {item.name}
                                     </td>
+                                    {activeTab === "event-types" && (
+                                        <td className="px-6 py-4 text-charcoal-600 dark:text-gray-300">
+                                            {item.label || <span className="text-gray-400 italic">None</span>}
+                                        </td>
+                                    )}
+                                    {activeTab === "event-types" && (
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${item.isActive !== false ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-gray-100 text-gray-500 border border-gray-200'}`}>
+                                                {item.isActive !== false ? "Active" : "Hidden"}
+                                            </span>
+                                        </td>
+                                    )}
                                     {activeTab === "services" && (
                                         <td className="px-6 py-4 text-charcoal-600 dark:text-gray-300">
                                             ₹{item.ratePerDay?.toLocaleString()}
@@ -221,7 +238,7 @@ export default function AdminCommonTypes() {
                     </DialogHeader>
                     <form onSubmit={handleSave} className="space-y-4 py-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Name</label>
+                            <label className="block text-sm font-medium mb-1">Name (Internal ID, e.g. "wedding")</label>
                             <input
                                 type="text"
                                 value={formData.name || ""}
@@ -230,6 +247,33 @@ export default function AdminCommonTypes() {
                                 required
                             />
                         </div>
+
+                        {activeTab === "event-types" && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Display Label (e.g. "Wedding")</label>
+                                    <input
+                                        type="text"
+                                        value={formData.label || ""}
+                                        onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                                        className="w-full px-3 py-2 border rounded-md dark:bg-charcoal-700 dark:border-gray-600"
+                                        placeholder="Public display name"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isActive"
+                                        checked={formData.isActive !== false}
+                                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                        className="h-4 w-4 rounded border-gray-300 text-gold-600 animate-in fade-in zoom-in"
+                                    />
+                                    <label htmlFor="isActive" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Is Active (Shows in public filters)
+                                    </label>
+                                </div>
+                            </>
+                        )}
 
                         {activeTab === "services" && (
                             <>

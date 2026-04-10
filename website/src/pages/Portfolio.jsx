@@ -299,7 +299,10 @@ const Portfolio = () => {
       : portfolioImages.filter((img) => img.category === activeCategory);
 
   // Extract URLs for LuxGallery
-  const imageUrls = filteredImages.map((item) => getImageUrl(item.image));
+  const imageUrls = filteredImages.flatMap((item) => {
+    const images = Array.isArray(item.image) ? item.image : [item.image];
+    return images.map(img => getImageUrl(img));
+  });
 
   const tabs = [
     { id: "All", label: "All" },

@@ -14,7 +14,8 @@ class EnquiryModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'groomName', 'brideName', 'phoneNumber', 'eventStartDate', 
-        'eventEndDate', 'budget', 'location', 'message', 'status'
+        'eventEndDate', 'events', 'budget', 'location', 'services', 
+        'message', 'status'
     ];
 
     // Dates

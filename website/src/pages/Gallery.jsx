@@ -77,32 +77,35 @@ const Gallery = () => {
                         ) : (
                             <div className="row g-4 justify-content-center">
                                 {galleryItems.length > 0 ? (
-                                    galleryItems.map((item) => (
-                                        <div key={item._id} className="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                                            <div className="gallery-item position-relative overflow-hidden rounded-3 shadow-sm h-100">
-                                                <a
-                                                    href={getImageUrl(item.image)}
-                                                    className="glightbox"
-                                                    data-gallery="gallery"
-                                                    data-title={item.title}
-                                                    data-description={item.category}
-                                                >
-                                                    <img
-                                                        src={getImageUrl(item.image)}
-                                                        alt={item.title}
-                                                        className="img-fluid w-100 h-100 object-fit-cover"
-                                                        style={{ minHeight: "250px", maxHeight: "300px", objectFit: "cover" }}
-                                                    />
-                                                    <div className="gallery-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
-                                                        <div className="text-center text-white p-3">
-                                                            <h5 className="mb-1">{item.title}</h5>
-                                                            <p className="small mb-0 text-white-50">{item.category}</p>
+                                    galleryItems.flatMap((item) => {
+                                        const images = Array.isArray(item.image) ? item.image : [item.image];
+                                        return images.map((img, imgIdx) => (
+                                            <div key={`${item._id}-${imgIdx}`} className="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                                                <div className="gallery-item position-relative overflow-hidden rounded-3 shadow-sm h-100">
+                                                    <a
+                                                        href={getImageUrl(img)}
+                                                        className="glightbox"
+                                                        data-gallery="gallery"
+                                                        data-title={item.title}
+                                                        data-description={item.category}
+                                                    >
+                                                        <img
+                                                            src={getImageUrl(img)}
+                                                            alt={item.title}
+                                                            className="img-fluid w-100 h-100 object-fit-cover"
+                                                            style={{ minHeight: "250px", maxHeight: "300px", objectFit: "cover" }}
+                                                        />
+                                                        <div className="gallery-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                                                            <div className="text-center text-white p-3">
+                                                                <h5 className="mb-1">{item.title}</h5>
+                                                                <p className="small mb-0 text-white-50">{item.category}</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </a>
+                                                    </a>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))
+                                        ));
+                                    })
                                 ) : (
                                     <div className="col-12 text-center">
                                         <p>No gallery items found.</p>
