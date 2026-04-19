@@ -805,7 +805,7 @@ export default function AdminOrders() {
                       <SelectTrigger className="flex-1">
                         <SelectValue placeholder="Choose event type" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-[1000]">
                         {eventTypes.map((type) => (
                           <SelectItem key={type} value={type}>
                             {type}
@@ -869,7 +869,7 @@ export default function AdminOrders() {
                           ) : null}
                         </SelectValue>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="z-[1000]">
                         <div className="p-2 max-h-60 overflow-y-auto">
                           <div className="space-y-1">
                             {predefinedServices.map((service) => {
@@ -982,7 +982,7 @@ export default function AdminOrders() {
                     <SelectTrigger className="flex-1">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[1000]">
                       <SelectItem value="Pending">Pending</SelectItem>
                       <SelectItem value="In Progress">In Progress</SelectItem>
                       <SelectItem value="Delivered">Delivered</SelectItem>
@@ -1129,7 +1129,7 @@ export default function AdminOrders() {
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[1000]">
                       <SelectItem value="photography">Photography</SelectItem>
                       <SelectItem value="video">Video</SelectItem>
                       <SelectItem value="drone">Drone</SelectItem>
