@@ -12,7 +12,8 @@ class TestimonialModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'role', 'text', 'rating', 'status', 'order', 'thumbnail'];
+    // Aligning with DB schema and providing aliases
+    protected $allowedFields    = ['clientName', 'review', 'rating', 'status', 'display_order', 'thumbnail'];
 
     // Dates
     protected $useTimestamps = true;
@@ -20,33 +21,42 @@ class TestimonialModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $allowCallbacks = true;
-    protected $afterFind      = ['formatId'];
+    protected $afterFind      = ['formatData'];
 
-    protected function formatId(array $data)
+    protected function formatData(array $data)
     {
-        if (!isset($data['data'])) return $data;
+        if (!isset($data['data'])) {
+            return $data;
+        }
 
-        if (isset($data['singleton']) && $data['singleton']) {
-            if (isset($data['data']['id'])) {
-                $data['data']['_id'] = $data['data']['id'];
+        $formatRow = function (&$row) {
+            if (is_array($row)) {
+                if (isset($row['id'])) $row['_id'] = $row['id'];
+                if (isset($row['created_at'])) $row['createdAt'] = $row['created_at'];
+                if (isset($row['updated_at'])) $row['updatedAt'] = $row['updated_at'];
+                
+                // Add aliases for frontend compatibility
+                if (isset($row['clientName'])) $row['name'] = $row['clientName'];
+                if (isset($row['review'])) $row['text'] = $row['review'];
+                if (isset($row['review'])) $row['fullDescription'] = $row['review'];
+                if (isset($row['clientName'])) $row['coupleName'] = $row['clientName'];
+            } elseif (is_object($row)) {
+                if (isset($row->id)) $row->_id = $row->id;
+                if (isset($row->created_at)) $row->createdAt = $row->created_at;
+                if (isset($row->updated_at)) $row->updatedAt = $row->updated_at;
+                
+                if (isset($row->clientName)) $row->name = $row->clientName;
+                if (isset($row->review)) $row->text = $row->review;
+                if (isset($row->review)) $row->fullDescription = $row->review;
+                if (isset($row->clientName)) $row->coupleName = $row->clientName;
             }
-            if (isset($data['data']['created_at'])) {
-                $data['data']['createdAt'] = $data['data']['created_at'];
-            }
-            if (isset($data['data']['updated_at'])) {
-                $data['data']['updatedAt'] = $data['data']['updated_at'];
-            }
+        };
+
+        if (isset($data['data']['id']) || (isset($data['singular']) && $data['singular'])) {
+            $formatRow($data['data']);
         } else {
             foreach ($data['data'] as &$row) {
-                if (isset($row['id'])) {
-                    $row['_id'] = $row['id'];
-                }
-                if (isset($row['created_at'])) {
-                    $row['createdAt'] = $row['created_at'];
-                }
-                if (isset($row['updated_at'])) {
-                    $row['updatedAt'] = $row['updated_at'];
-                }
+                $formatRow($row);
             }
         }
         return $data;

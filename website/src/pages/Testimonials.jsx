@@ -247,7 +247,7 @@ export default function Testimonials() {
                         </button>
                       )}
                       <div className="tm-stars">
-                        {[...Array(r.rating || 5)].map((_, i) => (
+                        {[...Array(Number(r.rating || 5))].map((_, i) => (
                           <i key={i} className="bi bi-star-fill" />
                         ))}
                       </div>

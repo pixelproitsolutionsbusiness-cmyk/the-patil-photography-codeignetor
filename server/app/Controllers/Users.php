@@ -43,9 +43,38 @@ class Users extends ResourceController
             $id = $this->model->insert($json);
             if (!$id) return $this->fail($this->model->errors());
 
-            return $this->respondCreated($this->model->find($id));
+            $created = $this->model->find($id);
+            $this->sendUserWelcomeEmail($created);
+            
+            return $this->respondCreated($created);
         } catch (\Exception $e) {
             return $this->fail($e->getMessage());
+        }
+    }
+
+    private function sendUserWelcomeEmail($data)
+    {
+        try {
+            $email = \Config\Services::email();
+            $settingsModel = new \App\Models\SystemSettingsModel();
+            $settings = $settingsModel->find(1);
+            
+            $fromEmail = !empty($settings['contactEmail']) ? $settings['contactEmail'] : 'noreply@thepatilphotography.com';
+            $fromName = !empty($settings['businessName']) ? $settings['businessName'] : 'The Patil Photography';
+            
+            $email->setFrom($fromEmail, $fromName);
+            $email->setTo($data['email']);
+            $email->setSubject('Welcome to ' . $fromName);
+            
+            $message = "Hello " . ($data['name'] ?? 'User') . ",\n\n";
+            $message .= "Your account has been created successfully.\n";
+            $message .= "Login at: " . base_url() . "/admin/login\n";
+            $message .= "\nRegards,\n" . $fromName;
+
+            $email->setMessage($message);
+            $email->send();
+        } catch (\Exception $e) {
+            log_message('error', '[Users::sendUserWelcomeEmail] ' . $e->getMessage());
         }
     }
 

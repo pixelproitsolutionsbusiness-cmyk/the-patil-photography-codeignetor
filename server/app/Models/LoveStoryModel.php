@@ -13,7 +13,7 @@ class LoveStoryModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'title', 'location', 'description', 'thumbnail', 'gallery', 'status', 'order', 'created_at', 'updated_at'
+        'title', 'location', 'description', 'thumbnail', 'gallery', 'status', 'display_order'
     ];
 
     // Dates
@@ -21,35 +21,36 @@ class LoveStoryModel extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+    
     protected $beforeInsert   = ['encodeGallery'];
     protected $beforeUpdate   = ['encodeGallery'];
-    protected $afterFind      = ['formatId', 'decodeGallery'];
+    protected $afterFind      = ['formatData', 'decodeGallery'];
 
-    protected function formatId(array $data)
+    protected function formatData(array $data)
     {
-        if (!isset($data['data'])) return $data;
+        if (!isset($data['data'])) {
+            return $data;
+        }
 
-        if (isset($data['singleton']) && $data['singleton']) {
-            if (isset($data['data']['id'])) {
-                $data['data']['_id'] = $data['data']['id'];
+        $formatRow = function (&$row) {
+            if (is_array($row)) {
+                if (isset($row['id'])) $row['_id'] = $row['id'];
+                if (isset($row['created_at'])) $row['createdAt'] = $row['created_at'];
+                if (isset($row['updated_at'])) $row['updatedAt'] = $row['updated_at'];
+                if (isset($row['display_order'])) $row['order'] = $row['display_order'];
+            } elseif (is_object($row)) {
+                if (isset($row->id)) $row->_id = $row->id;
+                if (isset($row->created_at)) $row->createdAt = $row->created_at;
+                if (isset($row->updated_at)) $row->updatedAt = $row->updated_at;
+                if (isset($row->display_order)) $row->order = $row->display_order;
             }
-            if (isset($data['data']['created_at'])) {
-                $data['data']['createdAt'] = $data['data']['created_at'];
-            }
-            if (isset($data['data']['updated_at'])) {
-                $data['data']['updatedAt'] = $data['data']['updated_at'];
-            }
+        };
+
+        if (isset($data['data']['id']) || (isset($data['singular']) && $data['singular'])) {
+            $formatRow($data['data']);
         } else {
             foreach ($data['data'] as &$row) {
-                if (isset($row['id'])) {
-                    $row['_id'] = $row['id'];
-                }
-                if (isset($row['created_at'])) {
-                    $row['createdAt'] = $row['created_at'];
-                }
-                if (isset($row['updated_at'])) {
-                    $row['updatedAt'] = $row['updated_at'];
-                }
+                $formatRow($row);
             }
         }
         return $data;
@@ -58,36 +59,29 @@ class LoveStoryModel extends Model
     protected function decodeGallery(array $data)
     {
         if (isset($data['data'])) {
-            if (isset($data['singleton']) && $data['singleton']) {
+            $isSingular = isset($data['data']['id']) || (isset($data['singular']) && $data['singular']);
+            
+            if ($isSingular) {
                 $gallery = $data['data']['gallery'] ?? null;
-                if (is_string($gallery)) {
-                    if (strpos($gallery, '~%~') !== false) {
-                        $data['data']['gallery'] = explode('~%~', $gallery);
-                    } else {
-                        // try json decode
-                        $decoded = json_decode($gallery, true);
-                        $data['data']['gallery'] = is_array($decoded) ? $decoded : [$gallery];
-                    }
-                } else {
-                    $data['data']['gallery'] = is_array($gallery) ? $gallery : [];
-                }
+                $data['data']['gallery'] = $this->_parseGallery($gallery);
             } else {
                 foreach ($data['data'] as &$row) {
                     $gallery = $row['gallery'] ?? null;
-                    if (is_string($gallery)) {
-                        if (strpos($gallery, '~%~') !== false) {
-                            $row['gallery'] = explode('~%~', $gallery);
-                        } else {
-                            $decoded = json_decode($gallery, true);
-                            $row['gallery'] = is_array($decoded) ? $decoded : [$gallery];
-                        }
-                    } else {
-                        $row['gallery'] = is_array($gallery) ? $gallery : [];
-                    }
+                    $row['gallery'] = $this->_parseGallery($gallery);
                 }
             }
         }
         return $data;
+    }
+    
+    private function _parseGallery($gallery) {
+        if (empty($gallery)) return [];
+        if (is_array($gallery)) return $gallery;
+        if (strpos($gallery, '~%~') !== false) {
+            return explode('~%~', $gallery);
+        }
+        $decoded = json_decode($gallery, true);
+        return is_array($decoded) ? $decoded : [$gallery];
     }
 
     protected function encodeGallery(array $data)
