@@ -129,15 +129,15 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
           </tr>
         </thead>
         <tbody>
-          ${quotation.services
+          ${(quotation.services || [])
       .map(
         (service) => `
             <tr style="border: 1px solid #e5e5e5;">
-              <td style="padding: 12px; border: 1px solid #e5e5e5;">${service.serviceName}</td>
-              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.quantity}</td>
-              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.days}</td>
-              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;">₹${service.ratePerDay.toLocaleString()}</td>
-              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;"><strong>₹${service.total.toLocaleString()}</strong></td>
+              <td style="padding: 12px; border: 1px solid #e5e5e5;">${service.serviceName || ""}</td>
+              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.quantity || 0}</td>
+              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.days || 0}</td>
+              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;">₹${(service.ratePerDay || 0).toLocaleString()}</td>
+              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;"><strong>₹${(service.total || 0).toLocaleString()}</strong></td>
             </tr>
           `,
       )
@@ -155,24 +155,24 @@ export const generateQuotationPDF = (quotation, client, settings = {}) => {
         <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
           <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
             <span>Subtotal:</span>
-            <span>₹${quotation.subtotal.toLocaleString()}</span>
+            <span>₹${(quotation.subtotal || 0).toLocaleString()}</span>
           </div>
-          ${quotation.discount > 0
+          ${(quotation.discount || 0) > 0
       ? `
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
               <span>Discount ${quotation.discountType === "percentage" ? `(${quotation.discount}%)` : ""}:</span>
-              <span>-₹${(quotation.discountType === "percentage" ? (quotation.subtotal * quotation.discount) / 100 : quotation.discount).toLocaleString()}</span>
+              <span>-₹${(quotation.discountType === "percentage" ? ((quotation.subtotal || 0) * quotation.discount) / 100 : quotation.discount).toLocaleString()}</span>
             </div>
           `
       : ""
     }
           <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
-            <span>Tax (${quotation.taxPercentage}%):</span>
-            <span>₹${quotation.tax.toLocaleString()}</span>
+            <span>Tax (${quotation.taxPercentage || 0}%):</span>
+            <span>₹${(quotation.tax || 0).toLocaleString()}</span>
           </div>
           <div style="border-top: 2px solid #d4a574; padding-top: 8px; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; color: #d4a574;">
             <span>Grand Total:</span>
-            <span>₹${quotation.grandTotal.toLocaleString()}</span>
+            <span>₹${(quotation.grandTotal || 0).toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -289,15 +289,15 @@ export const generateInvoicePDF = (invoice, client, settings = {}) => {
           </tr>
         </thead>
         <tbody>
-          ${invoice.services
+          ${(invoice.services || [])
       .map(
         (service) => `
             <tr style="border: 1px solid #e5e5e5;">
-              <td style="padding: 12px; border: 1px solid #e5e5e5;">${service.serviceName}</td>
-              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.quantity}</td>
-              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.days}</td>
-              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;">₹${service.ratePerDay.toLocaleString()}</td>
-              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;"><strong>₹${service.total.toLocaleString()}</strong></td>
+              <td style="padding: 12px; border: 1px solid #e5e5e5;">${service.serviceName || ""}</td>
+              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.quantity || 0}</td>
+              <td style="padding: 12px; text-align: center; border: 1px solid #e5e5e5;">${service.days || 0}</td>
+              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;">₹${(service.ratePerDay || 0).toLocaleString()}</td>
+              <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;"><strong>₹${(service.total || 0).toLocaleString()}</strong></td>
             </tr>
           `,
       )
@@ -323,24 +323,24 @@ export const generateInvoicePDF = (invoice, client, settings = {}) => {
         <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
           <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
             <span>Subtotal:</span>
-            <span>₹${invoice.subtotal.toLocaleString()}</span>
+            <span>₹${(invoice.subtotal || 0).toLocaleString()}</span>
           </div>
-          ${invoice.discount > 0
+          ${(invoice.discount || 0) > 0
       ? `
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
               <span>Discount ${invoice.discountType === "percentage" ? `(${invoice.discount}%)` : ""}:</span>
-              <span>-₹${(invoice.discountType === "percentage" ? (invoice.subtotal * invoice.discount) / 100 : invoice.discount).toLocaleString()}</span>
+              <span>-₹${(invoice.discountType === "percentage" ? ((invoice.subtotal || 0) * invoice.discount) / 100 : invoice.discount).toLocaleString()}</span>
             </div>
           `
       : ""
     }
           <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
-            <span>Tax (${invoice.taxPercentage}%):</span>
-            <span>₹${invoice.tax.toLocaleString()}</span>
+            <span>Tax (${invoice.taxPercentage || 0}%):</span>
+            <span>₹${(invoice.tax || 0).toLocaleString()}</span>
           </div>
           <div style="border-top: 2px solid #d4a574; padding-top: 8px; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; color: #d4a574;">
             <span>Grand Total:</span>
-            <span>₹${invoice.grandTotal.toLocaleString()}</span>
+            <span>₹${(invoice.grandTotal || 0).toLocaleString()}</span>
           </div>
         </div>
       </div>

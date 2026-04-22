@@ -24,12 +24,13 @@ class ContactModel extends Model
 
     protected function formatId(array $data)
     {
-        if (!isset($data['data'])) return $data;
+        if (!isset($data['data'])) {
+            return $data;
+        }
 
-        if (isset($data['singleton']) && $data['singleton']) {
-            if (isset($data['data']['id'])) {
-                $data['data']['_id'] = $data['data']['id'];
-            }
+        if (isset($data['data']['id'])) {
+            // Single result
+            $data['data']['_id'] = $data['data']['id'];
             if (isset($data['data']['created_at'])) {
                 $data['data']['createdAt'] = $data['data']['created_at'];
             }
@@ -37,15 +38,16 @@ class ContactModel extends Model
                 $data['data']['updatedAt'] = $data['data']['updated_at'];
             }
         } else {
+            // Multiple results
             foreach ($data['data'] as &$row) {
-                if (isset($row['id'])) {
-                    $row['_id'] = $row['id'];
-                }
-                if (isset($row['created_at'])) {
-                    $row['createdAt'] = $row['created_at'];
-                }
-                if (isset($row['updated_at'])) {
-                    $row['updatedAt'] = $row['updated_at'];
+                if (is_array($row)) {
+                    if (isset($row['id'])) $row['_id'] = $row['id'];
+                    if (isset($row['created_at'])) $row['createdAt'] = $row['created_at'];
+                    if (isset($row['updated_at'])) $row['updatedAt'] = $row['updated_at'];
+                } elseif (is_object($row)) {
+                    if (isset($row->id)) $row->_id = $row->id;
+                    if (isset($row->created_at)) $row->createdAt = $row->created_at;
+                    if (isset($row->updated_at)) $row->updatedAt = $row->updated_at;
                 }
             }
         }

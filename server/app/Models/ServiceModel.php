@@ -25,16 +25,20 @@ class ServiceModel extends Model
 
     protected function formatId(array $data)
     {
-        if (!isset($data['data'])) return $data;
+        if (!isset($data['data'])) {
+            return $data;
+        }
 
-        if (isset($data['singleton']) && $data['singleton']) {
-            if (isset($data['data']['id'])) {
-                $data['data']['_id'] = $data['data']['id'];
-            }
+        if (isset($data['data']['id'])) {
+            // Single result
+            $data['data']['_id'] = $data['data']['id'];
         } else {
+            // Multiple results
             foreach ($data['data'] as &$row) {
-                if (isset($row['id'])) {
+                if (is_array($row) && isset($row['id'])) {
                     $row['_id'] = $row['id'];
+                } elseif (is_object($row) && isset($row->id)) {
+                    $row->_id = $row->id;
                 }
             }
         }

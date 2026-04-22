@@ -55,7 +55,32 @@ class Orders extends ResourceController
             $id = $this->model->insert($json);
             if (!$id) return $this->fail($this->model->errors());
 
+            // --- AUTO-CREATE CLIENT ---
+            try {
+                $clientModel = new \App\Models\ClientModel();
+                $existingClient = $clientModel->where('email', $json['email'] ?? '')
+                                             ->orWhere('phone', $json['customerPhone'] ?? '')
+                                             ->first();
+                if (!$existingClient) {
+                    $clientModel->insert([
+                        'name'     => $json['customerName'] ?? 'Unknown',
+                        'email'    => $json['email'] ?? '',
+                        'phone'    => $json['customerPhone'] ?? '',
+                        'category' => 'New Inquiry',
+                        'status'   => 'Active'
+                    ]);
+                }
+            } catch (\Exception $e) {
+                log_message('error', '[Orders::autoCreateClient] ' . $e->getMessage());
+            }
+            // ---------------------------
+
             $created = $this->model->find($id);
+            
+            // --- SEND EMAIL ---
+            $this->sendOrderEmail($created);
+            // ------------------
+            
             return $this->respondCreated($created);
         } catch (\Exception $e) {
             log_message('error', '[Orders::create] ' . $e->getMessage());
@@ -104,6 +129,33 @@ class Orders extends ResourceController
         } catch (\Exception $e) {
             log_message('error', '[Orders::delete] ' . $e->getMessage());
             return $this->fail($e->getMessage());
+        }
+    }
+
+    private function sendOrderEmail($data)
+    {
+        try {
+            $email = \Config\Services::email();
+            $settingsModel = new \App\Models\SystemSettingsModel();
+            $settings = $settingsModel->find(1);
+            
+            $fromEmail = !empty($settings['contactEmail']) ? $settings['contactEmail'] : 'noreply@thepatilphotography.com';
+            $fromName = !empty($settings['businessName']) ? $settings['businessName'] : 'The Patil Photography';
+            
+            $email->setFrom($fromEmail, $fromName);
+            $email->setTo($data['email'] ?? 'pixelproitsolutionsbusiness@gmail.com');
+            $email->setSubject('Order Confirmation - ' . ($data['event_name'] ?? 'The Patil Photography'));
+            
+            $message = "Hello " . ($data['customerName'] ?? 'Customer') . ",\n\n";
+            $message .= "Your order for " . ($data['event_name'] ?? 'the event') . " has been created successfully.\n";
+            $message .= "Event Date: " . ($data['date'] ?? 'N/A') . "\n";
+            $message .= "Total Amount: " . ($data['amount'] ?? '0') . "\n";
+            $message .= "\nThank you for choosing us!";
+
+            $email->setMessage($message);
+            $email->send();
+        } catch (\Exception $e) {
+            log_message('error', '[Orders::sendOrderEmail] ' . $e->getMessage());
         }
     }
 }
