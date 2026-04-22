@@ -29,26 +29,23 @@ class GalleryModel extends Model
             return $data;
         }
 
-        if (isset($data['data']['id'])) {
-            // Single result
-            $data['data']['_id'] = $data['data']['id'];
-        } else {
-            // Multiple results
-            foreach ($data['data'] as &$row) {
-                if (is_array($row) && isset($row['id'])) {
-                    $row['_id'] = $row['id'];
-                } elseif (is_object($row) && isset($row->id)) {
-                    $row->_id = $row->id;
-                }
+        $formatRow = function (&$row) {
+            if (is_array($row)) {
+                if (isset($row['id'])) $row['_id'] = $row['id'];
+                if (isset($row['created_at'])) $row['createdAt'] = $row['created_at'];
+                if (isset($row['updated_at'])) $row['updatedAt'] = $row['updated_at'];
+            } elseif (is_object($row)) {
+                if (isset($row->id)) $row->_id = $row->id;
+                if (isset($row->created_at)) $row->createdAt = $row->created_at;
+                if (isset($row->updated_at)) $row->updatedAt = $row->updated_at;
             }
-        }
-        return $data;
-    }
+        };
+
+        if (isset($data['data']['id'])) {
+            $formatRow($data['data']);
         } else {
             foreach ($data['data'] as &$row) {
-                if (isset($row['id'])) {
-                    $row['_id'] = $row['id'];
-                }
+                $formatRow($row);
             }
         }
         return $data;

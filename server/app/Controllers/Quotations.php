@@ -13,27 +13,49 @@ class Quotations extends ResourceController
 
     public function index()
     {
-        return $this->respond($this->model->findAll());
+        $quotations = $this->model->findAll();
+        $itemModel = new QuotationItemModel();
+        
+        foreach ($quotations as &$q) {
+            $id = $q['id'] ?? $q['_id'] ?? null;
+            if ($id) {
+                $items = $itemModel->where('quotation_id', $id)->findAll();
+                $q['services'] = $items;
+                $q['items'] = $items;
+            } else {
+                $q['services'] = [];
+                $q['items'] = [];
+            }
+        }
+        
+        return $this->respond($quotations);
     }
 
     public function create()
     {
         $data = $this->request->getJSON(true);
-        $items = $data['items'] ?? [];
-        unset($data['items']);
+        $services = $data['services'] ?? $data['items'] ?? [];
+        
+        // Remove fields not in allowedFields
+        unset($data['services'], $data['items'], $data['_id'], $data['id']);
 
         if ($id = $this->model->insert($data)) {
             $itemModel = new QuotationItemModel();
-            foreach ($items as $item) {
+            foreach ($services as $item) {
                 $item['quotation_id'] = $id;
+                unset($item['id'], $item['_id']);
                 $itemModel->insert($item);
             }
             
             $created = $this->model->find($id);
-            $created['items'] = $itemModel->where('quotation_id', $id)->findAll();
-            
-            // --- SEND EMAIL ---
-            $this->sendQuotationEmail($created);
+            if ($created) {
+                $items = $itemModel->where('quotation_id', $id)->findAll();
+                $created['services'] = $items;
+                $created['items'] = $items;
+                
+                // --- SEND EMAIL ---
+                $this->sendQuotationEmail($created);
+            }
             
             return $this->respondCreated($created);
         }
@@ -45,7 +67,9 @@ class Quotations extends ResourceController
         $data = $this->model->find($id);
         if ($data) {
             $itemModel = new QuotationItemModel();
-            $data['items'] = $itemModel->where('quotation_id', $id)->findAll();
+            $items = $itemModel->where('quotation_id', $id)->findAll();
+            $data['services'] = $items;
+            $data['items'] = $items;
             return $this->respond($data);
         }
         return $this->failNotFound('Not Found');
@@ -54,14 +78,16 @@ class Quotations extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
-        $items = $data['items'] ?? null;
-        unset($data['items'], $data['_id'], $data['id']);
+        $services = $data['services'] ?? $data['items'] ?? null;
+        
+        // Remove fields not in allowedFields
+        unset($data['services'], $data['items'], $data['_id'], $data['id']);
 
         if ($this->model->update($id, $data)) {
-            if ($items !== null) {
+            if ($services !== null) {
                 $itemModel = new QuotationItemModel();
                 $itemModel->where('quotation_id', $id)->delete();
-                foreach ($items as $item) {
+                foreach ($services as $item) {
                     $item['quotation_id'] = $id;
                     unset($item['id'], $item['_id']);
                     $itemModel->insert($item);
@@ -70,7 +96,9 @@ class Quotations extends ResourceController
             $updated = $this->model->find($id);
             if ($updated) {
                 $itemModel = new QuotationItemModel();
-                $updated['items'] = $itemModel->where('quotation_id', $id)->findAll();
+                $items = $itemModel->where('quotation_id', $id)->findAll();
+                $updated['services'] = $items;
+                $updated['items'] = $items;
             }
             return $this->respond($updated);
         }
@@ -80,6 +108,9 @@ class Quotations extends ResourceController
     public function delete($id = null)
     {
         if ($this->model->delete($id)) {
+            // Also delete items (though DB has ON DELETE CASCADE, it's safer to check)
+            $itemModel = new QuotationItemModel();
+            $itemModel->where('quotation_id', $id)->delete();
             return $this->respondDeleted(['id' => $id]);
         }
         return $this->fail($this->model->errors());

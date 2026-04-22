@@ -44,13 +44,4 @@ class ServiceModel extends Model
         }
         return $data;
     }
-        } else {
-            foreach ($data['data'] as &$row) {
-                if (isset($row['id'])) {
-                    $row['_id'] = $row['id'];
-                }
-            }
-        }
-        return $data;
-    }
 }
