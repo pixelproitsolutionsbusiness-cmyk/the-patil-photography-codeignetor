@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useCallback } from "react";
+import { getImageUrl } from "../lib/apiFetch";
 import "./LuxGallery.css";
 
 let glightboxReady = false;
@@ -45,7 +46,7 @@ const LuxGallery = ({ images = [], galleryId = "gallery" }) => {
     if (glRef.current) return;
 
     const elements = images.map((src) => ({
-      href: src,
+      href: getImageUrl(src),
       type: "image",
       alt: "",
     }));
@@ -113,12 +114,12 @@ const LuxGallery = ({ images = [], galleryId = "gallery" }) => {
         return (
           <a
             key={`${galleryId}-${index}`}
-            href={image}
+            href={getImageUrl(image)}
             className={`pp-gal-item ${isTall ? "pp-gal-item--tall" : ""}`}
             onClick={(e) => handleClick(e, index)}
           >
             <img
-              src={image}
+              src={getImageUrl(image)}
               alt={`photo ${index + 1}`}
               loading="lazy"
               decoding="async"

@@ -113,21 +113,21 @@ export default function AdminContacts() {
 
     // Calculate aggregate data
     const aggStats = {
-        totalOrders: dashboardData.orders.length,
-        ordersCompleted: dashboardData.orders.filter(o => o.order_status === 'Completed').length,
-        ordersInProgress: dashboardData.orders.filter(o => o.order_status === 'In Progress').length,
-        ordersBooked: dashboardData.orders.filter(o => o.order_status === 'Booked').length,
+        totalOrders: dashboardData?.orders?.length || 0,
+        ordersCompleted: dashboardData?.orders?.filter(o => o.order_status === 'Completed').length || 0,
+        ordersInProgress: dashboardData?.orders?.filter(o => o.order_status === 'In Progress').length || 0,
+        ordersBooked: dashboardData?.orders?.filter(o => o.order_status === 'Booked').length || 0,
         
-        totalEnquiries: dashboardData.enquiries.length,
-        enquiriesNew: dashboardData.enquiries.filter(e => e.status === 'New').length,
-        enquiriesBooked: dashboardData.enquiries.filter(e => e.status === 'Booked').length,
+        totalEnquiries: dashboardData?.enquiries?.length || 0,
+        enquiriesNew: dashboardData?.enquiries?.filter(e => e.status === 'New').length || 0,
+        enquiriesBooked: dashboardData?.enquiries?.filter(e => e.status === 'Booked').length || 0,
         
-        totalInvoices: dashboardData.invoices.length,
-        invoicesPaid: dashboardData.invoices.filter(i => i.status === 'Paid').length,
-        invoicesOverdue: dashboardData.invoices.filter(i => i.status === 'Overdue').length,
+        totalInvoices: dashboardData?.invoices?.length || 0,
+        invoicesPaid: dashboardData?.invoices?.filter(i => i.status === 'Paid').length || 0,
+        invoicesOverdue: dashboardData?.invoices?.filter(i => i.status === 'Overdue').length || 0,
         
-        totalClients: dashboardData.clients.length,
-        totalUsers: dashboardData.users.length,
+        totalClients: dashboardData?.clients?.length || 0,
+        totalUsers: dashboardData?.users?.length || 0,
         totalContacts: messages.length
     };
 

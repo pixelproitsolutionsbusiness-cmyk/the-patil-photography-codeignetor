@@ -55,7 +55,7 @@ class Contacts extends ResourceController
 
         try {
             $email->send();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             log_message('error', 'Contact Email failed: ' . $e->getMessage());
         }
     }
