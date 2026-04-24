@@ -95,7 +95,7 @@ class Enquiries extends ResourceController
 
             $email->setMessage($message);
             $email->send();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             log_message('error', '[Enquiries::sendEnquiryEmail] ' . $e->getMessage());
         }
     }

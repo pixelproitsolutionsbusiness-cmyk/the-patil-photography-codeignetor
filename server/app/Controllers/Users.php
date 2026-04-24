@@ -18,7 +18,7 @@ class Users extends ResourceController
             // The frontend AdminUsers.jsx might expect them if it wants to "reveal".
             // But usually we don't send hashes.
             return $this->respond($users);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->fail($e->getMessage());
         }
     }
@@ -47,7 +47,7 @@ class Users extends ResourceController
             $this->sendUserWelcomeEmail($created);
             
             return $this->respondCreated($created);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->fail($e->getMessage());
         }
     }
@@ -81,7 +81,7 @@ class Users extends ResourceController
             } else {
                 log_message('info', '[Users::sendUserWelcomeEmail] Email sent successfully to: ' . $data['email']);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             log_message('error', '[Users::sendUserWelcomeEmail] Exception: ' . $e->getMessage());
         }
     }
@@ -103,7 +103,7 @@ class Users extends ResourceController
             }
 
             return $this->respond($this->model->find($id));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->fail($e->getMessage());
         }
     }
@@ -116,7 +116,7 @@ class Users extends ResourceController
                 return $this->respondDeleted(['id' => $id, 'message' => 'User deleted successfuly']);
             }
             return $this->fail('Could not delete user');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->fail($e->getMessage());
         }
     }
@@ -154,7 +154,7 @@ class Users extends ResourceController
             return $this->respond([
                 'password' => 'Encrypted (Cannot Reveal)'
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->fail($e->getMessage());
         }
     }

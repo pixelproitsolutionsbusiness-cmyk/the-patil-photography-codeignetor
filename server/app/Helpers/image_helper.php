@@ -32,7 +32,8 @@ if (!function_exists('save_base64_image')) {
             }
 
             // Create unique filename with correct extension
-            $fileName = $folder . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . ($extension === 'jpeg' ? 'jpg' : $extension);
+            $prefix = str_replace('/', '_', $folder);
+            $fileName = $prefix . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . ($extension === 'jpeg' ? 'jpg' : $extension);
             $fullPath = $targetDir . '/' . $fileName;
 
             $success = false;

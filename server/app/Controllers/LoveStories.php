@@ -30,6 +30,13 @@ class LoveStories extends ResourceController
                 $data['gallery'][$key] = save_base64_image($img, 'stories/gallery');
             }
         }
+        if (isset($data['order'])) {
+            $data['display_order'] = $data['order'];
+        }
+        
+        // Remove non-database fields
+        unset($data['id'], $data['_id'], $data['order'], $data['createdAt'], $data['updatedAt'], $data['created_at'], $data['updated_at']);
+
         log_message('debug', 'LoveStories::create - Inserting into model');
         if ($this->model->insert($data)) {
             log_message('debug', 'LoveStories::create - Success');
@@ -61,9 +68,18 @@ class LoveStories extends ResourceController
         if (isset($data['gallery']) && is_array($data['gallery'])) {
             log_message('debug', 'LoveStories::update - Saving gallery images: ' . count($data['gallery']));
             foreach ($data['gallery'] as $key => $img) {
+                log_message('debug', 'LoveStories::update - Processing gallery image ' . $key . ' (length: ' . (is_string($img) ? strlen($img) : 'not a string') . ')');
                 $data['gallery'][$key] = save_base64_image($img, 'stories/gallery');
             }
         }
+        
+        if (isset($data['order'])) {
+            $data['display_order'] = $data['order'];
+        }
+
+        // Remove non-database fields
+        unset($data['id'], $data['_id'], $data['order'], $data['createdAt'], $data['updatedAt'], $data['created_at'], $data['updated_at']);
+
         log_message('debug', 'LoveStories::update - Updating model');
         if ($this->model->update($id, $data)) {
             log_message('debug', 'LoveStories::update - Success');
