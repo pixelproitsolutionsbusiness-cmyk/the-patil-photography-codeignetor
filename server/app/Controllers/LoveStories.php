@@ -18,18 +18,24 @@ class LoveStories extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
+        log_message('debug', 'LoveStories::create - Data received: ' . json_encode(array_keys($data)));
         helper('image');
         if (isset($data['thumbnail'])) {
+            log_message('debug', 'LoveStories::create - Saving thumbnail');
             $data['thumbnail'] = save_base64_image($data['thumbnail'], 'stories');
         }
         if (isset($data['gallery']) && is_array($data['gallery'])) {
+            log_message('debug', 'LoveStories::create - Saving gallery images: ' . count($data['gallery']));
             foreach ($data['gallery'] as $key => $img) {
                 $data['gallery'][$key] = save_base64_image($img, 'stories/gallery');
             }
         }
+        log_message('debug', 'LoveStories::create - Inserting into model');
         if ($this->model->insert($data)) {
+            log_message('debug', 'LoveStories::create - Success');
             return $this->respondCreated($data);
         }
+        log_message('error', 'LoveStories::create - Failed: ' . json_encode($this->model->errors()));
         return $this->fail($this->model->errors());
     }
 
@@ -45,19 +51,25 @@ class LoveStories extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
+        log_message('debug', "LoveStories::update - ID: $id, Keys: " . json_encode(array_keys($data)));
         helper('image');
         $oldItem = $this->model->find($id);
         if (isset($data['thumbnail'])) {
+            log_message('debug', 'LoveStories::update - Saving thumbnail');
             $data['thumbnail'] = save_base64_image($data['thumbnail'], 'stories', $oldItem['thumbnail'] ?? null);
         }
         if (isset($data['gallery']) && is_array($data['gallery'])) {
+            log_message('debug', 'LoveStories::update - Saving gallery images: ' . count($data['gallery']));
             foreach ($data['gallery'] as $key => $img) {
                 $data['gallery'][$key] = save_base64_image($img, 'stories/gallery');
             }
         }
+        log_message('debug', 'LoveStories::update - Updating model');
         if ($this->model->update($id, $data)) {
+            log_message('debug', 'LoveStories::update - Success');
             return $this->respond($data);
         }
+        log_message('error', 'LoveStories::update - Failed: ' . json_encode($this->model->errors()));
         return $this->fail($this->model->errors());
     }
 

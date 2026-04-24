@@ -62,6 +62,7 @@ class Users extends ResourceController
             $fromEmail = !empty($settings['contactEmail']) ? $settings['contactEmail'] : 'noreply@thepatilphotography.com';
             $fromName = !empty($settings['businessName']) ? $settings['businessName'] : 'The Patil Photography';
             
+            $email->clear();
             $email->setFrom($fromEmail, $fromName);
             $email->setTo($data['email']);
             $email->setSubject('Welcome to ' . $fromName);
@@ -72,9 +73,16 @@ class Users extends ResourceController
             $message .= "\nRegards,\n" . $fromName;
 
             $email->setMessage($message);
-            $email->send();
+            
+            if (!$email->send()) {
+                $debugger = $email->printDebugger(['headers']);
+                log_message('error', '[Users::sendUserWelcomeEmail] Email failed to send to: ' . $data['email']);
+                log_message('error', '[Users::sendUserWelcomeEmail] Debugger: ' . $debugger);
+            } else {
+                log_message('info', '[Users::sendUserWelcomeEmail] Email sent successfully to: ' . $data['email']);
+            }
         } catch (\Exception $e) {
-            log_message('error', '[Users::sendUserWelcomeEmail] ' . $e->getMessage());
+            log_message('error', '[Users::sendUserWelcomeEmail] Exception: ' . $e->getMessage());
         }
     }
 

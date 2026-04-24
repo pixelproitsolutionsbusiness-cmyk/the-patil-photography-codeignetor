@@ -13,7 +13,7 @@ class LoveStoryModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'title', 'location', 'description', 'thumbnail', 'gallery', 'status', 'display_order'
+        'title', 'location', 'description', 'thumbnail', 'gallery', 'status', 'order'
     ];
 
     // Dates
@@ -37,12 +37,12 @@ class LoveStoryModel extends Model
                 if (isset($row['id'])) $row['_id'] = $row['id'];
                 if (isset($row['created_at'])) $row['createdAt'] = $row['created_at'];
                 if (isset($row['updated_at'])) $row['updatedAt'] = $row['updated_at'];
-                if (isset($row['display_order'])) $row['order'] = $row['display_order'];
+                if (isset($row['order'])) $row['display_order'] = $row['order'];
             } elseif (is_object($row)) {
                 if (isset($row->id)) $row->_id = $row->id;
                 if (isset($row->created_at)) $row->createdAt = $row->created_at;
                 if (isset($row->updated_at)) $row->updatedAt = $row->updated_at;
-                if (isset($row->display_order)) $row->order = $row->display_order;
+                if (isset($row->order)) $row->display_order = $row->order;
             }
         };
 

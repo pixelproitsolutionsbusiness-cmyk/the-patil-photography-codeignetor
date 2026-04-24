@@ -18,7 +18,7 @@ class Email extends BaseConfig
     /**
      * The mail sending protocol: mail, sendmail, smtp
      */
-    public string $protocol = 'mail';
+    public string $protocol = 'smtp'; // Default to smtp for better reliability
 
     /**
      * The server path to Sendmail.
@@ -49,6 +49,20 @@ class Email extends BaseConfig
      * SMTP Port
      */
     public int $SMTPPort = 587;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->protocol = env('email.protocol', $this->protocol);
+        $this->SMTPHost = env('email.SMTPHost', $this->SMTPHost);
+        $this->SMTPUser = env('email.SMTPUser', $this->SMTPUser);
+        $this->SMTPPass = env('email.SMTPPass', $this->SMTPPass);
+        $this->SMTPPort = (int) env('email.SMTPPort', $this->SMTPPort);
+        $this->SMTPCrypto = env('email.SMTPCrypto', $this->SMTPCrypto);
+        $this->fromEmail = env('email.fromEmail', $this->fromEmail);
+        $this->fromName = env('email.fromName', $this->fromName);
+    }
 
     /**
      * SMTP Timeout (in seconds)
