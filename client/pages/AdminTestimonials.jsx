@@ -323,12 +323,29 @@ export default function AdminTestimonials() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-start">
                                                 <h3 className="font-semibold text-charcoal-900 truncate pr-2">{t.coupleName}</h3>
-                                                <button
-                                                    onClick={() => handleToggleStatus(t)}
-                                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${t.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-600 border-slate-200'}`}
-                                                >
-                                                    {t.status}
-                                                </button>
+                                                {t.status === 'Pending' ? (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => handleToggleStatus(t)}
+                                                            className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border bg-emerald-50 text-emerald-700 border-emerald-100"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(t._id)}
+                                                            className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border bg-rose-50 text-rose-700 border-rose-100"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleToggleStatus(t)}
+                                                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${t.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-100 text-slate-600 border-slate-200'}`}
+                                                    >
+                                                        {t.status}
+                                                    </button>
+                                                )}
                                             </div>
                                             <p className="text-xs text-slate-500">{t.location || "No Location"}</p>
                                             <div className="flex items-center gap-1 mt-1 text-amber-400">
@@ -462,12 +479,20 @@ export default function AdminTestimonials() {
                                         </td>
                                         <td className="px-6 py-4">
                                             {t.status === 'Pending' ? (
-                                                <button
-                                                    onClick={() => handleToggleStatus(t)}
-                                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100"
-                                                >
-                                                    Approve
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleToggleStatus(t)}
+                                                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(t._id)}
+                                                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border bg-rose-50 text-rose-700 border-rose-100 hover:bg-rose-100"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button
                                                     onClick={() => handleToggleStatus(t)}

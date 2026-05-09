@@ -12,8 +12,7 @@ class TestimonialModel extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    // Aligning with DB schema and providing aliases
-    protected $allowedFields    = ['clientName', 'review', 'rating', 'status', 'display_order', 'thumbnail'];
+    protected $allowedFields    = ['name', 'text', 'rating', 'status', 'display_order', 'thumbnail', 'role', 'order'];
 
     // Dates
     protected $useTimestamps = true;
@@ -34,21 +33,10 @@ class TestimonialModel extends Model
                 if (isset($row['id'])) $row['_id'] = $row['id'];
                 if (isset($row['created_at'])) $row['createdAt'] = $row['created_at'];
                 if (isset($row['updated_at'])) $row['updatedAt'] = $row['updated_at'];
-                
-                // Add aliases for frontend compatibility
-                if (isset($row['clientName'])) $row['name'] = $row['clientName'];
-                if (isset($row['review'])) $row['text'] = $row['review'];
-                if (isset($row['review'])) $row['fullDescription'] = $row['review'];
-                if (isset($row['clientName'])) $row['coupleName'] = $row['clientName'];
             } elseif (is_object($row)) {
                 if (isset($row->id)) $row->_id = $row->id;
                 if (isset($row->created_at)) $row->createdAt = $row->created_at;
                 if (isset($row->updated_at)) $row->updatedAt = $row->updated_at;
-                
-                if (isset($row->clientName)) $row->name = $row->clientName;
-                if (isset($row->review)) $row->text = $row->review;
-                if (isset($row->review)) $row->fullDescription = $row->review;
-                if (isset($row->clientName)) $row->coupleName = $row->clientName;
             }
         };
 
