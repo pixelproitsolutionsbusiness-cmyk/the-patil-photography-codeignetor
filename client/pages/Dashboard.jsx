@@ -220,7 +220,7 @@ export default function Dashboard() {
                   <Tooltip
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     cursor={{ fill: '#f1f5f9' }}
-                    formatter={(value) => [`₹${value.toLocaleString()}`, undefined]}
+                    formatter={(value) => [`₹${(value || 0).toLocaleString()}`, undefined]}
                   />
                   <Legend wrapperStyle={{ paddingTop: '20px' }} />
                   <Bar
@@ -313,7 +313,7 @@ export default function Dashboard() {
                       return <Cell key={`cell-${index}`} fill={colors[entry._id] || '#cbd5e1'} />;
                     })}
                   </Pie>
-                  <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                  <Tooltip formatter={(value) => `₹${(value || 0).toLocaleString()}`} />
                   <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>

@@ -117,8 +117,8 @@ export default function Reminders() {
                             {invoice.invoiceNumber}
                           </p>
                           <p className="font-montserrat text-xs text-charcoal-600 dark:text-charcoal-400">
-                            {invoice.clientId.name} - ₹
-                            {invoice.grandTotal.toLocaleString()}
+                            {(invoice.clientName || invoice.clientId?.name || "Unknown Client")} - ₹
+                            {(invoice.grandTotal || 0).toLocaleString()}
                           </p>
                           <p className="font-montserrat text-xs text-red-600">
                             Due:{" "}
@@ -163,8 +163,8 @@ export default function Reminders() {
                             {invoice.invoiceNumber}
                           </p>
                           <p className="font-montserrat text-xs text-charcoal-600 dark:text-charcoal-400">
-                            {invoice.clientId.name} - ₹
-                            {invoice.grandTotal.toLocaleString()}
+                            {(invoice.clientName || invoice.clientId?.name || "Unknown Client")} - ₹
+                            {(invoice.grandTotal || 0).toLocaleString()}
                           </p>
                           <p className="font-montserrat text-xs text-yellow-600">
                             Status: {invoice.paymentStatus}
@@ -209,7 +209,7 @@ export default function Reminders() {
                           className="flex-1 hover:text-blue-600 transition-colors"
                         >
                           <p className="font-montserrat text-sm font-semibold text-charcoal-900 dark:text-white">
-                            {quotation.clientId.name} - {quotation.eventType}
+                            {(quotation.clientName || quotation.clientId?.name || "Unknown Client")} - {quotation.eventType}
                           </p>
                           <p className="font-montserrat text-xs text-charcoal-600 dark:text-charcoal-400">
                             {quotation.quotationNumber}
