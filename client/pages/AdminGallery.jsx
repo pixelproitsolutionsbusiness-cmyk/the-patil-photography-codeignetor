@@ -19,7 +19,8 @@ export default function AdminGallery() {
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ id: null, title: "", image: [], category: "General", status: "Active" });
   const [deleteId, setDeleteId] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
   const { data: galleryItems = [], isLoading } = useQuery({
     queryKey: ["gallery"],
@@ -62,8 +63,6 @@ export default function AdminGallery() {
       toast.success(form.id ? "Gallery updated" : "Gallery created");
       setModalOpen(false);
       setForm({ id: null, title: "", image: [], category: "General", status: "Active" });
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
     },
     onError: (err) => toast.error(err.message),
   });
@@ -99,6 +98,25 @@ export default function AdminGallery() {
     setForm({ ...form, image: form.image.filter((_, i) => i !== index) });
   };
 
+  const handleSaveCategory = () => {
+    if (newCategory.trim()) {
+      const trimmed = newCategory.trim();
+      
+      // Try to save to backend
+      fetch('/api/event-types', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed }),
+      }).catch(err => console.error(err));
+
+      queryClient.invalidateQueries({ queryKey: ["eventTypes"] });
+      
+      setForm(prev => ({ ...prev, category: trimmed }));
+      setIsCategoryModalOpen(false);
+      setNewCategory("");
+    }
+  };
+
   return (
     <div className="mt-0 px-0 pt-0 pb-6 container mx-auto animate-in fade-in duration-500">
       <PageHeader
@@ -107,7 +125,7 @@ export default function AdminGallery() {
         action={
           <button
             onClick={() => { setForm({ id: null, title: "", image: [], category: "General", status: "Active" }); setModalOpen(true); }}
-            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-gray-800 transition-all font-playfair"
+            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white shadow-lg hover:bg-gray-800 transition-all"
           >
             <Plus size={18} /> Add Gallery
           </button>
@@ -197,129 +215,141 @@ export default function AdminGallery() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-40 p-4 font-sans" onClick={() => setModalOpen(false)}>
-          <div className="bg-white rounded-3xl w-full max-w-4xl shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 font-playfair">{form.id ? "Edit Masterpiece" : "New Collection"}</h2>
-                <p className="text-sm text-gray-500">Capture the essence of your photography work.</p>
-              </div>
-              <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-900 transition-colors p-2 bg-gray-50 rounded-full">✕</button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-40 p-4" onClick={(e) => {
+          if (isCategoryModalOpen) {
+            e.stopPropagation();
+            return;
+          }
+          setModalOpen(false);
+        }}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-3xl shadow-2xl animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto custom-scrollbar" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">{form.id ? "Edit Gallery" : "New Gallery"}</h2>
+              <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">✕</button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Title</label>
+                  <input
+                    type="text"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-shadow"
+                    placeholder="e.g. Royal Wedding Bliss"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-[0.1em] text-gray-500 mb-2">Collection Title</label>
-                    <input
-                      type="text"
-                      value={form.title}
-                      onChange={(e) => setForm({ ...form, title: e.target.value })}
-                      className="w-full border-2 border-gray-100 rounded-2xl px-5 py-3.5 text-base focus:ring-2 focus:ring-gold-500 focus:border-transparent outline-none transition-all placeholder:text-gray-300"
-                      placeholder="e.g. Royal Wedding Bliss"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <div className="flex justify-between items-center mb-2">
-                        <label className="block text-xs font-bold uppercase tracking-[0.1em] text-gray-500">Category</label>
-                        <Link to="/admin-common-types" className="text-[10px] text-gold-600 hover:text-gold-700 font-bold uppercase tracking-wider hover:underline">Manage Categories</Link>
-                      </div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category</label>
+                    <div className="flex gap-2">
                       <Select
                         value={form.category}
                         onValueChange={(value) => setForm({ ...form, category: value })}
                       >
-                        <SelectTrigger className="rounded-2xl border-2 border-gray-100 py-6">
+                        <SelectTrigger className="flex-1">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+                        <SelectContent className="z-[110]">
                           <SelectItem value="General">General</SelectItem>
                           {eventTypes.map((type) => (
-                            <SelectItem key={type._id} value={type.name}>
+                            <SelectItem key={type._id || type.name} value={type.name}>
                               {type.label || type.name}
                             </SelectItem>
                           ))}
+                          {form.category && form.category !== "General" && !eventTypes.some(t => t.name === form.category) && (
+                            <SelectItem key="legacy" value={form.category}>{form.category}</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-[0.1em] text-gray-500 mb-2">Visibility</label>
-                      <Select
-                        value={form.status}
-                        onValueChange={(value) => setForm({ ...form, status: value })}
+                      <button
+                        type="button"
+                        onClick={() => setIsCategoryModalOpen(true)}
+                        className="shrink-0 rounded-lg border border-gold-200 bg-gold-50 px-3 text-gold-600 hover:bg-gold-100 flex items-center justify-center"
+                        title="Add new category"
                       >
-                        <SelectTrigger className="rounded-2xl border-2 border-gray-100 py-6">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-gray-100 shadow-xl">
-                          <SelectItem value="Active">Public</SelectItem>
-                          <SelectItem value="Inactive">Hidden</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        <Plus size={16} />
+                      </button>
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Status</label>
+                    <Select
+                      value={form.status}
+                      onValueChange={(value) => setForm({ ...form, status: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent className="z-[110]">
+                        <SelectItem value="Active">Active</SelectItem>
+                        <SelectItem value="Inactive">Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-[0.1em] text-gray-500 mb-2">
-                    Gallery Images ({form.image.length})
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Gallery Images ({form.image.length})
+                </label>
+                
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {form.image.map((img, index) => (
+                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group shadow-sm">
+                      <img src={getImageUrl(img)} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-1 right-1 bg-white text-red-500 p-1 rounded-full shadow-md hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  <label className="aspect-square flex flex-col items-center justify-center cursor-pointer rounded-lg border-2 border-dashed border-gray-200 hover:bg-gray-50 transition-colors text-gray-400 group bg-gray-50/50">
+                    <Plus size={24} className="mb-1" />
+                    <span className="text-xs">Add</span>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
                   </label>
-                  
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {form.image.map((img, index) => (
-                      <div key={index} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-gray-100 group shadow-sm">
-                        <img src={getImageUrl(img)} alt={`Preview ${index}`} className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                    
-                    <label className="aspect-square flex flex-col items-center justify-center cursor-pointer rounded-2xl border-2 border-dashed border-gray-200 hover:border-gold-500 hover:bg-gold-50/30 transition-all text-gray-400 group">
-                      <Plus size={24} className="group-hover:scale-110 transition-transform mb-1" />
-                      <span className="text-[10px] font-bold uppercase tracking-tighter">Add</span>
-                      <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  
-                  <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
-                    <p className="text-[10px] text-gray-400 font-bold uppercase mb-2">Quick Tips</p>
-                    <ul className="text-xs text-gray-500 space-y-1.5 list-disc list-inside">
-                      <li>Upload multiple images at once</li>
-                      <li>High resolution JPEG/PNG recommended</li>
-                      <li>First image will be used as the cover</li>
-                    </ul>
-                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-4">
-              <button onClick={() => setModalOpen(false)} className="px-6 py-3 text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors uppercase tracking-widest">Discard</button>
+            <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-100">
+              <button onClick={() => setModalOpen(false)} className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
               <button 
-                onClick={() => mutation.mutate(form)} 
+                onClick={() => {
+                  if(!form.title){
+                    toast.error("Please provide a title");
+                    return;
+                  }
+                  if(form.image.length === 0){
+                    toast.error("Please upload at least one image");
+                    return;
+                  }
+                  mutation.mutate(form)
+                }} 
                 disabled={mutation.isPending} 
-                className="px-8 py-3.5 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all shadow-xl disabled:opacity-50 flex items-center gap-3 font-bold uppercase tracking-widest text-xs"
+                className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors shadow-md flex items-center gap-2"
               >
                 {mutation.isPending ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    Processing...
+                    Saving...
                   </>
                 ) : (
-                  form.id ? "Apply Changes" : "Publish Gallery"
+                  form.id ? "Update Gallery" : "Add Gallery"
                 )}
               </button>
             </div>
@@ -344,12 +374,37 @@ export default function AdminGallery() {
         </div>
       )}
 
-      {/* Success Popup */}
-      {showSuccess && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[150] animate-in slide-in-from-bottom duration-500">
-          <div className="flex items-center gap-4 rounded-3xl bg-gray-900 px-8 py-4 shadow-2xl text-white border border-white/10">
-            <div className="w-8 h-8 bg-gold-500 rounded-full flex items-center justify-center text-lg">✨</div>
-            <div className="font-bold text-sm uppercase tracking-widest">Gallery synchronized successfully</div>
+      {/* Category Modal */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" onClick={() => setIsCategoryModalOpen(false)}>
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold text-gray-900">Add New Category</h3>
+            <p className="mt-1 text-xs text-gray-500">Enter a new category to add to the list.</p>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700">Category Name</label>
+              <input
+                type="text"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                placeholder="e.g. Corporate Event"
+                autoFocus
+              />
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50 font-medium"
+                onClick={() => setIsCategoryModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                onClick={handleSaveCategory}
+              >
+                Add Category
+              </button>
+            </div>
           </div>
         </div>
       )}
