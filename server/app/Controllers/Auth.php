@@ -38,6 +38,11 @@ class Auth extends ResourceController
 
             // Check if user exists and password is correct
             if ($user && password_verify($password, $user['password'])) {
+                // Check if user is active
+                if (($user['status'] ?? 'Active') !== 'Active') {
+                    return $this->failForbidden('Your account is currently inactive. Please contact the administrator.');
+                }
+
                 // Remove sensitive fields
                 unset($user['password']);
                 
