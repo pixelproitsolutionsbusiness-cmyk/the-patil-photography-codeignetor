@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Upload, Trash2, Eye, EyeOff } from "lucide-react";
 import PageHeader from "../components/PageHeader";
+import { getImageUrl } from "../lib/apiFetch";
 
 export default function AdminPopup() {
     const queryClient = useQueryClient();
@@ -116,7 +117,13 @@ export default function AdminPopup() {
                             <div className="flex items-center gap-4">
                                 <button
                                     type="button"
-                                    onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
+                                    onClick={() => {
+                                        if (!formData.isActive && !formData.title && !formData.description && !formData.image) {
+                                            toast.error("Cannot activate an empty popup. Please add content first.");
+                                            return;
+                                        }
+                                        setFormData({ ...formData, isActive: !formData.isActive });
+                                    }}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${formData.isActive
                                         ? "bg-green-50 border-green-200 text-green-700 font-medium"
                                         : "bg-slate-50 border-slate-200 text-slate-600"
@@ -148,7 +155,7 @@ export default function AdminPopup() {
                             {formData.image ? (
                                 <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
                                     <img
-                                        src={formData.image}
+                                        src={formData.image.startsWith('data:') ? formData.image : getImageUrl(formData.image)}
                                         alt="Popup"
                                         className="w-full h-auto object-cover max-h-[300px]"
                                     />

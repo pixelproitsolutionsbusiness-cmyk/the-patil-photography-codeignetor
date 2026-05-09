@@ -113,30 +113,39 @@ try {
          $pdo->exec("ALTER TABLE sliders ADD COLUMN subtitle VARCHAR(255) NULL");
      }
 
-     // Testimonials table alignment (rename old columns if they exist)
-     foreach ([['clientName', 'name', "VARCHAR(100) NULL"], ['review', 'text', "TEXT NULL"]] as $col) {
-         if (columnExists($pdo, 'testimonials', $col[0]) && !columnExists($pdo, 'testimonials', $col[1])) {
-             $pdo->exec("ALTER TABLE testimonials CHANGE COLUMN `{$col[0]}` `{$col[1]}` {$col[2]}");
-             echo "Renamed column {$col[0]} to {$col[1]} in testimonials.<br>";
-         }
-     }
-     if (!columnExists($pdo, 'testimonials', 'role')) $pdo->exec("ALTER TABLE testimonials ADD COLUMN role VARCHAR(100) NULL");
-     if (!columnExists($pdo, 'testimonials', 'thumbnail')) $pdo->exec("ALTER TABLE testimonials ADD COLUMN thumbnail TEXT NULL");
-     if (!columnExists($pdo, 'testimonials', 'order')) $pdo->exec("ALTER TABLE testimonials ADD COLUMN `order` INT DEFAULT 0");
-     
-     // Love Stories (Gallery & Order)
-     if (!columnExists($pdo, 'love_stories', 'gallery')) $pdo->exec("ALTER TABLE love_stories ADD COLUMN gallery TEXT NULL");
-     if (columnExists($pdo, 'love_stories', 'display_order') && !columnExists($pdo, 'love_stories', 'order')) {
-         $pdo->exec("ALTER TABLE love_stories CHANGE COLUMN `display_order` `order` INT DEFAULT 0");
-     }
+      // Testimonials table alignment (rename old columns if they exist)
+      foreach ([['clientName', 'name', "VARCHAR(100) NULL"], ['review', 'text', "TEXT NULL"]] as $col) {
+          if (columnExists($pdo, 'testimonials', $col[0]) && !columnExists($pdo, 'testimonials', $col[1])) {
+              $pdo->exec("ALTER TABLE testimonials CHANGE COLUMN `{$col[0]}` `{$col[1]}` {$col[2]}");
+              echo "Renamed column {$col[0]} to {$col[1]} in testimonials.<br>";
+          }
+      }
+      if (!columnExists($pdo, 'testimonials', 'role')) $pdo->exec("ALTER TABLE testimonials ADD COLUMN role VARCHAR(100) NULL");
+      if (!columnExists($pdo, 'testimonials', 'thumbnail')) $pdo->exec("ALTER TABLE testimonials ADD COLUMN thumbnail TEXT NULL");
+      if (!columnExists($pdo, 'testimonials', 'order')) $pdo->exec("ALTER TABLE testimonials ADD COLUMN `order` INT DEFAULT 0");
+      
+      // Ensure testimonials status includes 'Pending'
+      $pdo->exec("ALTER TABLE testimonials MODIFY COLUMN status ENUM('Active', 'Inactive', 'Pending') DEFAULT 'Pending'");
+      echo "Testimonials status updated to include 'Pending'.<br>";
+      
+      // Love Stories (Gallery & Order)
+      if (!columnExists($pdo, 'love_stories', 'gallery')) $pdo->exec("ALTER TABLE love_stories ADD COLUMN gallery TEXT NULL");
+      if (columnExists($pdo, 'love_stories', 'display_order') && !columnExists($pdo, 'love_stories', 'order')) {
+          $pdo->exec("ALTER TABLE love_stories CHANGE COLUMN `display_order` `order` INT DEFAULT 0");
+      }
 
-     // Team
-     if (!columnExists($pdo, 'team_members', 'order')) $pdo->exec("ALTER TABLE team_members ADD COLUMN `order` INT DEFAULT 0");
-     
-     // Popups (Subtitle, Link, Status)
-     if (!columnExists($pdo, 'popups', 'subtitle')) $pdo->exec("ALTER TABLE popups ADD COLUMN subtitle TEXT NULL");
-     if (!columnExists($pdo, 'popups', 'link')) $pdo->exec("ALTER TABLE popups ADD COLUMN link VARCHAR(255) NULL");
-     if (!columnExists($pdo, 'popups', 'status')) $pdo->exec("ALTER TABLE popups ADD COLUMN status ENUM('Active', 'Inactive') DEFAULT 'Active'");
+      // Team
+      if (!columnExists($pdo, 'team_members', 'order')) $pdo->exec("ALTER TABLE team_members ADD COLUMN `order` INT DEFAULT 0");
+      
+      // Popups (Subtitle, Link, Status)
+      if (!columnExists($pdo, 'popups', 'subtitle')) $pdo->exec("ALTER TABLE popups ADD COLUMN subtitle TEXT NULL");
+      if (!columnExists($pdo, 'popups', 'link')) $pdo->exec("ALTER TABLE popups ADD COLUMN link VARCHAR(255) NULL");
+      if (!columnExists($pdo, 'popups', 'status')) $pdo->exec("ALTER TABLE popups ADD COLUMN status ENUM('Active', 'Inactive') DEFAULT 'Active'");
+      
+      // Ensure Users status exists and is correct
+      if (!columnExists($pdo, 'users', 'status')) {
+          $pdo->exec("ALTER TABLE users ADD COLUMN status VARCHAR(50) DEFAULT 'Active' AFTER role");
+      }
 
      echo "<br><b>Database migration successful!</b>";
 

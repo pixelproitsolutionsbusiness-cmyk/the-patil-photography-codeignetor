@@ -96,9 +96,44 @@ class Dashboard extends ResourceController
                 ]
             ];
 
-            $activityFeed = [
-                ['text' => 'System dashboard updated', 'date' => date('Y-m-d H:i:s'), 'type' => 'System'],
-            ];
+            $activities = [];
+
+            // Recent Enquiries
+            $recentEnquiries = $enquiryModel->orderBy('created_at', 'DESC')->limit(5)->find();
+            foreach ($recentEnquiries as $e) {
+                $activities[] = [
+                    'text' => 'New Enquiry: ' . ($e['names'] ?? $e['groomName'] ?? 'Unknown'),
+                    'date' => $e['created_at'],
+                    'type' => 'Enquiry'
+                ];
+            }
+
+            // Recent Orders
+            $recentOrders = $invoiceModel->orderBy('created_at', 'DESC')->limit(5)->find();
+            foreach ($recentOrders as $o) {
+                $activities[] = [
+                    'text' => 'New Order: INV-' . ($o['invoiceNumber'] ?? 'N/A'),
+                    'date' => $o['created_at'],
+                    'type' => 'Order'
+                ];
+            }
+
+            // Recent Testimonials
+            $recentTestimonials = $testiModel->orderBy('created_at', 'DESC')->limit(5)->find();
+            foreach ($recentTestimonials as $t) {
+                $activities[] = [
+                    'text' => 'New Testimonial from ' . ($t['name'] ?? $t['clientName'] ?? 'Client'),
+                    'date' => $t['created_at'],
+                    'type' => 'Testimonial'
+                ];
+            }
+
+            // Sort by date DESC
+            usort($activities, function($a, $b) {
+                return strtotime($b['date']) - strtotime($a['date']);
+            });
+
+            $activityFeed = array_slice($activities, 0, 7);
 
             $ordersByType = $invoiceModel->select('eventType as _id, count(*) as count')->groupBy('eventType')->findAll();
 

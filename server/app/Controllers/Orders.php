@@ -58,17 +58,25 @@ class Orders extends ResourceController
             // --- AUTO-CREATE CLIENT ---
             try {
                 $clientModel = new \App\Models\ClientModel();
-                $existingClient = $clientModel->where('email', $json['email'] ?? '')
-                                             ->orWhere('phone', $json['customerPhone'] ?? '')
-                                             ->first();
-                if (!$existingClient) {
-                    $clientModel->insert([
-                        'name'     => $json['customerName'] ?? 'Unknown',
-                        'email'    => $json['email'] ?? '',
-                        'phone'    => $json['customerPhone'] ?? '',
-                        'category' => 'New Inquiry',
-                        'status'   => 'Active'
-                    ]);
+                $email = $json['email'] ?? '';
+                $phone = $json['whatsapp_no'] ?? $json['customerPhone'] ?? '';
+                $name = $json['name'] ?? $json['customerName'] ?? 'Unknown';
+
+                if (!empty($email) || !empty($phone)) {
+                    $existingClient = $clientModel->groupStart()
+                                                 ->where('email', $email)
+                                                 ->orWhere('phone', $phone)
+                                                 ->groupEnd()
+                                                 ->first();
+                    if (!$existingClient) {
+                        $clientModel->insert([
+                            'name'     => $name,
+                            'email'    => $email,
+                            'phone'    => $phone,
+                            'category' => 'New Inquiry',
+                            'status'   => 'Active'
+                        ]);
+                    }
                 }
             } catch (\Exception $e) {
                 log_message('error', '[Orders::autoCreateClient] ' . $e->getMessage());

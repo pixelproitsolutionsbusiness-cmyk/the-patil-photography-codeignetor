@@ -125,6 +125,7 @@ export default function AdminOrders() {
   }
 
   function openEdit(order) {
+    setShowView(false);
     setEditingOrder(order);
 
     // Retrieve stashed data from serviceConfig if available (Legacy fallback)
@@ -389,7 +390,8 @@ export default function AdminOrders() {
   }
 
   function sendPaymentReminder(order) {
-    if (!order.whatsapp_no) {
+    const phone = order.whatsapp_no || order.customerPhone;
+    if (!phone) {
       alert("Client WhatsApp number not found!");
       return;
     }
@@ -404,12 +406,13 @@ export default function AdminOrders() {
     }
 
     // Format phone number (remove spaces, dashes, +)
-    const phoneNumber = order.whatsapp_no.replace(/[^\d]/g, "");
+    const phoneNumber = phone.replace(/[^\d]/g, "");
     
     // Create professional payment reminder message
-    const eventName = order.event_name || "Your Event";
+    const clientName = order.name || order.customerName || "Customer";
+    const eventNameFormatted = order.event_name ? `your ${order.event_name}` : "your event";
     const message = encodeURIComponent(
-      `Hello ${order.name}!\n\nThis is a friendly reminder regarding the payment for your ${eventName}.\n\n Payment Details:\n• Total Amount: ₹${Number(total).toLocaleString()}\n• Amount Paid: ₹${Number(paid).toLocaleString()}\n• Outstanding Balance: ₹${Number(remaining).toLocaleString()}\n\nKindly arrange for the remaining payment at your earliest convenience.\n\nThank you for choosing The Patil Photography!\n\nBest regards,\nThe Patil Photography Team`
+      `Hello ${clientName}!\n\nThis is a friendly reminder regarding the payment for ${eventNameFormatted}.\n\n Payment Details:\n• Total Amount: ₹${Number(total).toLocaleString()}\n• Amount Paid: ₹${Number(paid).toLocaleString()}\n• Outstanding Balance: ₹${Number(remaining).toLocaleString()}\n\nKindly arrange for the remaining payment at your earliest convenience.\n\nThank you for choosing The Patil Photography!\n\nBest regards,\nThe Patil Photography Team`
     );
 
     // Open WhatsApp

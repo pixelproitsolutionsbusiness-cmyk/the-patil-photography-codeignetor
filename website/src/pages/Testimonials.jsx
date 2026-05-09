@@ -60,12 +60,14 @@ export default function Testimonials() {
       .then(r => r.json())
       .then(d => { 
         if (Array.isArray(d)) {
-          setTestimonials(d.map(item => ({
+          let mappedData = d.map(item => ({
             ...item,
             coupleName: item.name || item.coupleName || "",
             location: item.role || item.location || "",
             fullDescription: item.text || item.fullDescription || ""
-          })));
+          }));
+          mappedData.sort((a, b) => (a.order || a.display_order || 0) - (b.order || b.display_order || 0));
+          setTestimonials(mappedData);
         } 
       })
       .catch(() => {})

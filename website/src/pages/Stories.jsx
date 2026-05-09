@@ -18,7 +18,7 @@ export default function Stories() {
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data))
-          setStories(data.filter((s) => s.status === "Active"));
+          setStories(data.filter((s) => s.status === "Active").sort((a, b) => (a.order || 0) - (b.order || 0)));
       })
       .catch((err) => console.error("Error fetching love stories:", err))
       .finally(() => setLoading(false));
