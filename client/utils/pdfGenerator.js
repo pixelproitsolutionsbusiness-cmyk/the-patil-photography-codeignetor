@@ -417,84 +417,94 @@ export const generateOrderPDF = (order, settings = {}) => {
   const eventDate = order.event_date || order.date ? new Date(order.event_date || order.date).toLocaleDateString() : "N/A";
 
   const content = `
-    <div style="font-family: 'Playfair Display', serif; padding: 40px; background: white; color: #1a1a1a;">
+    <div style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 50px; background: white; color: #1a1a1a;">
       <!-- Header -->
-      <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #d4a574; padding-bottom: 20px;">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 2px solid #f0f0f0; padding-bottom: 30px;">
+        <div style="display: flex; gap: 20px; align-items: center;">
           ${logoHtml}
           <div>
-            <h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #1a1a1a;">${businessName}</h1>
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #111; letter-spacing: -0.5px;">${businessName}</h1>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">${contactText}</p>
           </div>
         </div>
-        <h2 style="font-size: 24px; font-weight: bold; margin: 20px 0 0 0; color: #1a1a1a;">PAYMENT RECEIPT</h2>
+        <div style="text-align: right;">
+          <h2 style="font-size: 28px; font-weight: 800; margin: 0; color: #d4a574; letter-spacing: 1px; text-transform: uppercase;">RECEIPT</h2>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: #666;"><strong>ID:</strong> #${order._id.slice(-6).toUpperCase()}</p>
+          <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
       </div>
 
       <!-- Receipt Details -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; background: #fafafa; padding: 25px; border-radius: 12px;">
         <div>
-          <h3 style="color: #d4a574; font-size: 12px; font-weight: bold; margin-bottom: 10px;">CLIENT DETAILS</h3>
-          <p style="margin: 0; font-size: 16px; font-weight: bold;">${order.name || order.customerName}</p>
-          <p style="margin: 5px 0; font-size: 12px;">${order.email || ""}</p>
-          <p style="margin: 5px 0; font-size: 12px;">${order.whatsapp_no || order.customerPhone || ""}</p>
+          <h3 style="color: #888; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Billed To</h3>
+          <p style="margin: 0; font-size: 18px; font-weight: 700; color: #111;">${order.name || order.customerName}</p>
+          ${(order.email) ? `<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">${order.email}</p>` : ''}
+          ${(order.whatsapp_no || order.customerPhone) ? `<p style="margin: 4px 0 0 0; font-size: 13px; color: #555;">${order.whatsapp_no || order.customerPhone}</p>` : ''}
         </div>
-        <div style="text-align: right;">
-          <p style="margin: 5px 0; font-size: 12px;"><strong>Order ID:</strong> #${order._id.slice(-6).toUpperCase()}</p>
-          <p style="margin: 5px 0; font-size: 12px;"><strong>Receipt Date:</strong> ${new Date().toLocaleDateString()}</p>
-          <p style="margin: 5px 0; font-size: 12px;"><strong>Event:</strong> ${order.event_name || "-"}</p>
-          <p style="margin: 5px 0; font-size: 12px;"><strong>Event Date:</strong> ${eventDate}</p>
+        <div>
+          <h3 style="color: #888; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Event Details</h3>
+          <p style="margin: 0; font-size: 15px; font-weight: 600; color: #333;">${order.event_name || "-"}</p>
+          <p style="margin: 6px 0 0 0; font-size: 13px; color: #555;"><strong>Date:</strong> ${eventDate}</p>
+          ${(order.photography_type) ? `<p style="margin: 4px 0 0 0; font-size: 13px; color: #555;"><strong>Type:</strong> ${order.photography_type}</p>` : ''}
         </div>
       </div>
 
       <!-- Financial Summary Table -->
-      <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px;">
         <thead>
-          <tr style="background: #2d2d2d; color: white;">
-            <th style="padding: 12px; text-align: left; border: 1px solid #d4a574;">Description</th>
-            <th style="padding: 12px; text-align: right; border: 1px solid #d4a574;">Amount</th>
+          <tr style="border-bottom: 2px solid #111;">
+            <th style="padding: 16px 12px; text-align: left; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Description</th>
+            <th style="padding: 16px 12px; text-align: right; font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 1px;">Amount</th>
           </tr>
         </thead>
         <tbody>
-          <tr style="border: 1px solid #e5e5e5;">
-            <td style="padding: 15px; border: 1px solid #e5e5e5;">Total Project Value (${order.photography_type || "Service"})</td>
-            <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5;">₹${total.toLocaleString()}</td>
-          </tr>
-          <tr style="border: 1px solid #e5e5e5;">
-            <td style="padding: 12px; border: 1px solid #e5e5e5;">Amount Received</td>
-            <td style="padding: 12px; text-align: right; border: 1px solid #e5e5e5; font-weight: bold; color: green;">₹${paid.toLocaleString()}</td>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td style="padding: 20px 12px; font-size: 15px; color: #333; font-weight: 500;">Total Project Value ${(order.photography_type) ? `(${order.photography_type})` : ''}</td>
+            <td style="padding: 20px 12px; text-align: right; font-size: 15px; color: #111; font-weight: 600;">₹${total.toLocaleString()}</td>
           </tr>
         </tbody>
       </table>
 
       <!-- Summary / Balance -->
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 30px;">
-        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; width: 300px;">
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
+        <div style="width: 320px;">
+          <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px; color: #555;">
             <span>Total Amount:</span>
-            <span>₹${total.toLocaleString()}</span>
+            <span style="font-weight: 600; color: #111;">₹${total.toLocaleString()}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
-            <span>Paid Amount:</span>
-            <span>₹${paid.toLocaleString()}</span>
+          <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 16px; color: #555;">
+            <span>Amount Received:</span>
+            <span style="font-weight: 600; color: #10b981;">- ₹${paid.toLocaleString()}</span>
           </div>
-          <div style="border-top: 2px solid #d4a574; padding-top: 8px; display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; color: #d4a574;">
-            <span>Balance Due:</span>
-            <span>₹${remaining > 0 ? remaining.toLocaleString() : "0 (Fully Paid)"}</span>
+          <div style="border-top: 2px solid #111; padding-top: 16px; display: flex; justify-content: space-between; font-size: 18px;">
+            <span style="font-weight: 700; color: #111;">Balance Due:</span>
+            <span style="font-weight: 800; color: ${remaining > 0 ? '#ef4444' : '#10b981'};">
+              ₹${remaining > 0 ? remaining.toLocaleString() : "0.00"}
+            </span>
           </div>
         </div>
       </div>
 
       <!-- Thank You -->
-      <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 30px;">
-        <p style="margin: 0; font-size: 12px; line-height: 1.6; font-style: italic;">Thank you for trusting us with your memories!</p>
+      <div style="background: ${remaining <= 0 ? '#ecfdf5' : '#fef2f2'}; border: 1px solid ${remaining <= 0 ? '#10b981' : '#ef4444'}; padding: 24px; border-radius: 12px; text-align: center; margin-bottom: 40px;">
+        <p style="margin: 0; font-size: 15px; font-weight: 600; color: ${remaining <= 0 ? '#047857' : '#b91c1c'};">
+          ${remaining <= 0 ? '✨ Thank you! This order is fully paid.' : '🔔 A balance payment is pending for this order.'}
+        </p>
       </div>
 
-      <!-- Footer with Contact Info and Social Links -->
-      <div style="border-top: 2px solid #d4a574; padding-top: 20px;">
-        <div style="text-align: center; margin-bottom: 15px;">
-          ${contactInfoHtml}
+      <!-- Footer -->
+      <div style="border-top: 1px solid #eee; padding-top: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 11px; color: #888; line-height: 1.8;">
+            ${primaryPhone ? `<span style="margin-right: 15px;">📞 ${primaryPhone}${secondaryPhone ? ` | ${secondaryPhone}` : ''}</span>` : ''}
+            ${contactEmail ? `<span style="margin-right: 15px;">✉️ ${contactEmail}</span>` : ''}
+            ${address ? `<span>📍 ${address}</span>` : ''}
+          </div>
+          <div style="font-size: 11px; color: #aaa; font-style: italic;">
+            Generated on ${new Date().toLocaleDateString()}
+          </div>
         </div>
-        <p style="margin: 10px 0 0 0; text-align: center; font-size: 10px; color: #666;">${businessName} | ${contactText}</p>
-        <p style="margin: 5px 0 0 0; text-align: center; font-size: 10px; color: #666;">Receipt Date: ${new Date().toLocaleDateString()}</p>
       </div>
     </div>
   `;
@@ -509,7 +519,8 @@ export const generateOrderPDF = (order, settings = {}) => {
 
   setTimeout(async () => {
     try {
-      await generatePDF("pdf-content", `Receipt_${(order.name || "Order").replace(/\s+/g, '_')}.pdf`);
+      const clientName = order.name || order.customerName || "Order";
+      await generatePDF("pdf-content", `${clientName.replace(/\s+/g, '_')}_Payment_Receipt.pdf`);
     } finally {
       document.body.removeChild(tempDiv);
     }
