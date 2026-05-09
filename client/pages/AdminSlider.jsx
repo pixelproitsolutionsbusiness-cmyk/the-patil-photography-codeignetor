@@ -18,7 +18,6 @@ export default function AdminSlider() {
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState({ id: null, title: "", subtitle: "", image: "", status: "Active", order: 0 });
   const [deleteId, setDeleteId] = useState(null);
-  const [showSuccess, setShowSuccess] = useState(false);
 
   const { data: rawSliders = [], isLoading } = useQuery({
     queryKey: ["slider"],
@@ -51,8 +50,6 @@ export default function AdminSlider() {
       toast.success(form.id ? "Slider updated" : "Slider created");
       setModalOpen(false);
       setForm({ id: null, title: "", subtitle: "", image: "", status: "Active", order: 0 });
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
     },
     onError: (err) => toast.error(err.message),
   });
@@ -75,8 +72,12 @@ export default function AdminSlider() {
 
   const handleSave = () => {
     // Basic validation
-    if (!form.title && !form.image) {
-      toast.error("Please provide at least a title or an image for the slide");
+    if (!form.image) {
+      toast.error("Please upload an image for the slide");
+      return;
+    }
+    if (!form.title) {
+      toast.error("Please provide a title for the slide");
       return;
     }
 
@@ -480,15 +481,6 @@ export default function AdminSlider() {
         )
       }
 
-      {/* Success Popup */}
-      {showSuccess && (
-        <div className="fixed bottom-10 right-10 z-[100] animate-bounce">
-          <div className="flex items-center gap-3 rounded-xl bg-emerald-500 px-6 py-4 shadow-2xl text-white">
-            <span className="text-2xl">👉</span>
-            <div className="font-bold">Slider saved successfully</div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

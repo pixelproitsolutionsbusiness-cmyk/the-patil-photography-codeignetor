@@ -113,21 +113,21 @@ export default function AdminContacts() {
 
     // Calculate aggregate data
     const aggStats = {
-        totalOrders: dashboardData.orders.length,
-        ordersCompleted: dashboardData.orders.filter(o => o.order_status === 'Completed').length,
-        ordersInProgress: dashboardData.orders.filter(o => o.order_status === 'In Progress').length,
-        ordersBooked: dashboardData.orders.filter(o => o.order_status === 'Booked').length,
+        totalOrders: dashboardData?.orders?.length || 0,
+        ordersCompleted: dashboardData?.orders?.filter(o => o.order_status === 'Completed').length || 0,
+        ordersInProgress: dashboardData?.orders?.filter(o => o.order_status === 'In Progress').length || 0,
+        ordersBooked: dashboardData?.orders?.filter(o => o.order_status === 'Booked').length || 0,
         
-        totalEnquiries: dashboardData.enquiries.length,
-        enquiriesNew: dashboardData.enquiries.filter(e => e.status === 'New').length,
-        enquiriesBooked: dashboardData.enquiries.filter(e => e.status === 'Booked').length,
+        totalEnquiries: dashboardData?.enquiries?.length || 0,
+        enquiriesNew: dashboardData?.enquiries?.filter(e => e.status === 'New').length || 0,
+        enquiriesBooked: dashboardData?.enquiries?.filter(e => e.status === 'Booked').length || 0,
         
-        totalInvoices: dashboardData.invoices.length,
-        invoicesPaid: dashboardData.invoices.filter(i => i.status === 'Paid').length,
-        invoicesOverdue: dashboardData.invoices.filter(i => i.status === 'Overdue').length,
+        totalInvoices: dashboardData?.invoices?.length || 0,
+        invoicesPaid: dashboardData?.invoices?.filter(i => i.status === 'Paid').length || 0,
+        invoicesOverdue: dashboardData?.invoices?.filter(i => i.status === 'Overdue').length || 0,
         
-        totalClients: dashboardData.clients.length,
-        totalUsers: dashboardData.users.length,
+        totalClients: dashboardData?.clients?.length || 0,
+        totalUsers: dashboardData?.users?.length || 0,
         totalContacts: messages.length
     };
 
@@ -152,14 +152,14 @@ export default function AdminContacts() {
                 description="Manage website contact form messages"
             />
 
-            {/* User & Settings Info Section */}
-            {(userData || globalSettings) && (
+            {/* User Info Section */}
+            {userData && (
                 <div className="bg-gradient-to-r from-charcoal-900 to-charcoal-800 text-white px-6 py-8 mb-8">
                     <div className="max-w-7xl mx-auto">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                             {/* User Info */}
                             {userData && (
-                                <div className="bg-white/10 backdrop-blur-md rounded-lg p-5">
+                                <div className="bg-white/10 backdrop-blur-md rounded-lg p-5 max-w-md mx-auto w-full">
                                     <div className="flex items-center gap-3 mb-4">
                                         <User size={20} className="text-gold-400" />
                                         <h3 className="text-sm font-bold uppercase tracking-wider">Account Owner</h3>
@@ -185,52 +185,6 @@ export default function AdminContacts() {
                                     </div>
                                 </div>
                             )}
-
-                            {/* Global Settings */}
-                            {globalSettings && (
-                                <div className="bg-white/10 backdrop-blur-md rounded-lg p-5">
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <Settings size={20} className="text-gold-400" />
-                                        <h3 className="text-sm font-bold uppercase tracking-wider">Organization Settings</h3>
-                                    </div>
-                                    <div className="space-y-2 text-sm">
-                                        <div>
-                                            <p className="text-slate-300 text-xs">Timezone</p>
-                                            <p className="font-semibold">{globalSettings.timezone || 'Not Set'}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-slate-300 text-xs">Currency</p>
-                                            <p className="font-semibold">{globalSettings.currency || 'Not Set'}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-slate-300 text-xs">Contract Template</p>
-                                            <p className="font-semibold text-xs truncate">{globalSettings.contractTemplate || 'Standard'}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-slate-300 text-xs">GST Number</p>
-                                            <p className="font-semibold text-xs truncate">{globalSettings.gstNumber || 'Not Set'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Message Stats Summary */}
-                            <div className="bg-white/10 backdrop-blur-md rounded-lg p-5">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <MessageSquare size={20} className="text-gold-400" />
-                                    <h3 className="text-sm font-bold uppercase tracking-wider">Messages Summary</h3>
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <p className="text-slate-300 text-xs">Total</p>
-                                        <p className="text-2xl font-bold">{contactStats.total}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-slate-300 text-xs">Pending</p>
-                                        <p className="text-2xl font-bold text-blue-400">{contactStats.new + contactStats.read}</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -77,5 +77,6 @@ $routes->group('api', function($routes) {
 });
 
 $routes->get('db-test', 'DbTest::index');
+$routes->get('test-email', 'TestEmail::index');
 $routes->get('debug-check', function() { return "API reachable"; });
 

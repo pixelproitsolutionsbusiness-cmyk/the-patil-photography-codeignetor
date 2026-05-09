@@ -114,6 +114,21 @@ export default function Dashboard() {
     }
   };
 
+  const handleRejectTestimonial = async (id) => {
+    if (!window.confirm("Are you sure you want to reject and delete this review?")) return;
+    try {
+      await fetch(`/api/testimonials/${id}`, {
+        method: "DELETE",
+      });
+      // Refresh stats
+      const res = await fetch("/api/dashboard/stats");
+      const json = await res.json();
+      setData(json);
+    } catch (err) {
+      console.error("Error rejecting testimonial:", err);
+    }
+  };
+
   return (
     <div className="relative min-h-screen bg-slate-50 text-charcoal-900 pb-20">
 
@@ -205,7 +220,7 @@ export default function Dashboard() {
                   <Tooltip
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                     cursor={{ fill: '#f1f5f9' }}
-                    formatter={(value) => [`₹${value.toLocaleString()}`, undefined]}
+                    formatter={(value) => [`₹${(value || 0).toLocaleString()}`, undefined]}
                   />
                   <Legend wrapperStyle={{ paddingTop: '20px' }} />
                   <Bar
@@ -298,7 +313,7 @@ export default function Dashboard() {
                       return <Cell key={`cell-${index}`} fill={colors[entry._id] || '#cbd5e1'} />;
                     })}
                   </Pie>
-                  <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
+                  <Tooltip formatter={(value) => `₹${(value || 0).toLocaleString()}`} />
                   <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
                 </PieChart>
               </ResponsiveContainer>
@@ -461,9 +476,15 @@ export default function Dashboard() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleApproveTestimonial(t._id)}
-                        className="flex-1 rounded-lg bg-amber-100 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-200 transition"
+                        className="flex-1 rounded-lg bg-emerald-100 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-200 transition"
                       >
                         Approve
+                      </button>
+                      <button
+                        onClick={() => handleRejectTestimonial(t._id)}
+                        className="flex-1 rounded-lg bg-rose-100 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-200 transition"
+                      >
+                        Reject
                       </button>
                       <button
                         onClick={() => setSelectedTestimonial(t)}
@@ -567,12 +588,21 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => {
+                  handleRejectTestimonial(selectedTestimonial._id);
+                  setSelectedTestimonial(null);
+                }}
+                className="flex-1 rounded-xl bg-rose-100 py-2.5 font-medium text-rose-700 hover:bg-rose-200"
+              >
+                Reject
+              </button>
+              <button
+                onClick={() => {
                   handleApproveTestimonial(selectedTestimonial._id);
                   setSelectedTestimonial(null);
                 }}
                 className="flex-1 rounded-xl bg-charcoal-900 py-2.5 font-medium text-white hover:bg-charcoal-800"
               >
-                Approve & Publish
+                Approve
               </button>
             </div>
           </div>

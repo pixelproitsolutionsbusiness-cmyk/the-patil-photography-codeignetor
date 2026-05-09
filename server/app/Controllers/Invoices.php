@@ -46,6 +46,26 @@ class Invoices extends ResourceController
                 unset($item['id'], $item['_id']);
                 $itemModel->insert($item);
             }
+
+            // --- AUTO-CREATE CLIENT ---
+            try {
+                if (!empty($data['clientName'])) {
+                    $clientModel = new \App\Models\ClientModel();
+                    $name = $data['clientName'];
+                    $existingClient = $clientModel->where('name', $name)->first();
+                    
+                    if (!$existingClient) {
+                        $clientModel->insert([
+                            'name'     => $name,
+                            'category' => 'New Client',
+                            'status'   => 'Active'
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                log_message('error', '[Invoices::autoCreateClient] ' . $e->getMessage());
+            }
+            // ---------------------------
             
             $created = $this->model->find($id);
             if ($created) {

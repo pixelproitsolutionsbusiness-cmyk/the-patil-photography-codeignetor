@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getImageUrl } from "../lib/apiFetch";
 
 const TributeModal = ({ isOpen, onClose }) => {
     const [show, setShow] = useState(false);
@@ -47,6 +48,9 @@ const TributeModal = ({ isOpen, onClose }) => {
 
     // Don't render while loading or if inactive
     if (loading || !data || !data.isActive) return null;
+
+    // Don't render if it is completely empty
+    if (!data.title && !data.description && !data.image) return null;
 
     // Styles
     const styles = {
@@ -181,7 +185,7 @@ const TributeModal = ({ isOpen, onClose }) => {
                     <div style={styles.imageWrapper}>
                         <div style={styles.imageContainer}>
                             <img
-                                src={data.image}
+                                src={getImageUrl(data.image)}
                                 alt={data.title || "Popup"}
                                 style={styles.image}
                             />

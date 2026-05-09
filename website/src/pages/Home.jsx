@@ -92,13 +92,13 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/slider")
       .then(r => r.json())
-      .then(d => setSlides(Array.isArray(d) ? d.filter(s => s.status === "Active") : []))
+      .then(d => setSlides(Array.isArray(d) ? d.filter(s => s.status === "Active").sort((a, b) => (a.order || 0) - (b.order || 0)) : []))
       .catch(() => {})
       .finally(() => setLdSlider(false));
 
     fetch("/api/love-stories")
       .then(r => r.json())
-      .then(d => setStories(Array.isArray(d) ? d.filter(s => s.status === "Active") : []))
+      .then(d => setStories(Array.isArray(d) ? d.filter(s => s.status === "Active").sort((a, b) => (a.order || 0) - (b.order || 0)) : []))
       .catch(() => {})
       .finally(() => setLdStories(false));
 

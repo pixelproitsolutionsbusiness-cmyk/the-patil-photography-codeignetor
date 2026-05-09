@@ -292,7 +292,7 @@ export default function Quotations() {
                           Grand Total
                         </p>
                         <p className="font-montserrat font-bold text-gold-600 text-lg">
-                          ₹{quotation.grandTotal.toLocaleString()}
+                          ₹{(quotation.grandTotal || 0).toLocaleString()}
                         </p>
                       </div>
                     </div>

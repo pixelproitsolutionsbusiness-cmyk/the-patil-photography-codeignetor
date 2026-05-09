@@ -46,6 +46,34 @@ class Quotations extends ResourceController
                 unset($item['id'], $item['_id']);
                 $itemModel->insert($item);
             }
+
+            // --- AUTO-CREATE CLIENT ---
+            try {
+                $clientModel = new \App\Models\ClientModel();
+                $email = $data['email'] ?? '';
+                $phone = $data['whatsapp_no'] ?? '';
+                $name = $data['clientName'] ?? 'Unknown';
+
+                if (!empty($email) || !empty($phone)) {
+                    $existingClient = $clientModel->groupStart()
+                                                 ->where('email', $email)
+                                                 ->orWhere('phone', $phone)
+                                                 ->groupEnd()
+                                                 ->first();
+                    if (!$existingClient) {
+                        $clientModel->insert([
+                            'name'     => $name,
+                            'email'    => $email,
+                            'phone'    => $phone,
+                            'category' => 'New Inquiry',
+                            'status'   => 'Active'
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                log_message('error', '[Quotations::autoCreateClient] ' . $e->getMessage());
+            }
+            // ---------------------------
             
             $created = $this->model->find($id);
             if ($created) {
