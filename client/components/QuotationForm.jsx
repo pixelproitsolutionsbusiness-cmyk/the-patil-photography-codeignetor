@@ -171,6 +171,7 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
       services: [
         ...prev.services,
         {
+          id: Math.random().toString(),
           serviceName: "",
           quantity: 1,
           days: 1,
@@ -302,9 +303,18 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
 
   const handleSaveEventType = () => {
     if (newEventType.trim()) {
-      // Add to event types list (using state? or just select it?)
-      // Since eventType input is text with datalist, setting formData.eventType is enough to "select" it
-      setFormData(prev => ({ ...prev, eventType: newEventType }));
+      const trimmed = newEventType.trim();
+      
+      // Try to save to backend
+      fetch('/api/event-types', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmed }),
+      }).catch(err => console.error(err));
+
+      // Add to event types list so it becomes a valid Select option
+      setEventTypes(prev => [...prev, { name: trimmed }]);
+      setFormData(prev => ({ ...prev, eventType: trimmed }));
       setIsEventTypeModalOpen(false);
       setNewEventType("");
     }
@@ -432,11 +442,18 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                     </SelectTrigger>
                     <SelectContent>
                       {eventTypes && eventTypes.length > 0 ? (
-                        eventTypes.map((et) => (
-                          <SelectItem key={et._id || et.name} value={et.name}>
-                            {et.name}
-                          </SelectItem>
-                        ))
+                        <>
+                          {eventTypes.map((et) => (
+                            <SelectItem key={et._id || et.name} value={et.name}>
+                              {et.name}
+                            </SelectItem>
+                          ))}
+                          {formData.eventType && !eventTypes.some(et => et.name === formData.eventType) && (
+                            <SelectItem key="legacy-evt" value={formData.eventType}>
+                              {formData.eventType}
+                            </SelectItem>
+                          )}
+                        </>
                       ) : (
                         <>
                           <SelectItem value="Wedding">Wedding</SelectItem>
@@ -445,6 +462,11 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                           <SelectItem value="Birthday">Birthday</SelectItem>
                           <SelectItem value="Anniversary">Anniversary</SelectItem>
                           <SelectItem value="Baby Shower">Baby Shower</SelectItem>
+                          {formData.eventType && !["Wedding", "Pre-Wedding", "Engagement", "Birthday", "Anniversary", "Baby Shower"].includes(formData.eventType) && (
+                            <SelectItem key="legacy-evt" value={formData.eventType}>
+                              {formData.eventType}
+                            </SelectItem>
+                          )}
                         </>
                       )}
                     </SelectContent>
@@ -506,12 +528,12 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
 
             <div className="space-y-4">
               {formData.services.map((service, index) => (
-                <div key={index} className="flex flex-wrap md:flex-nowrap gap-3 items-end p-4 bg-gray-50 dark:bg-charcoal-900 rounded-md border border-gray-100 dark:border-gray-700">
+                <div key={service._id || service.id || index} className="flex flex-wrap md:flex-nowrap gap-3 items-end p-4 bg-gray-50 dark:bg-charcoal-900 rounded-md border border-gray-100 dark:border-gray-700">
                   <div className="flex-grow w-full md:w-auto">
                     <label className="block text-xs text-gray-500 mb-1">Service Name *</label>
                     <div className="flex gap-2">
                       <Select 
-                        value={service.serviceName} 
+                        value={service.serviceName || undefined} 
                         onValueChange={(value) => handleServiceChange(index, "serviceName", value)}
                       >
                         <SelectTrigger className="flex-1 h-9">
@@ -519,10 +541,15 @@ export default function QuotationForm({ quotation, onSave, onCancel }) {
                         </SelectTrigger>
                         <SelectContent>
                           {predefinedServices.map(s => (
-                            <SelectItem key={s._id} value={s.name}>
+                            <SelectItem key={s._id || s.name} value={s.name}>
                               {s.name}
                             </SelectItem>
                           ))}
+                          {service.serviceName && !predefinedServices.some(s => s.name === service.serviceName) && (
+                            <SelectItem key="legacy-svc" value={service.serviceName}>
+                              {service.serviceName}
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <Button
