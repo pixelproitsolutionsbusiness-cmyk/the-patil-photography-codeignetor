@@ -82,7 +82,7 @@ class Auth extends ResourceController
             }
 
             return $this->failUnauthorized('Invalid email or password');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->respond([
                 'status' => 'error',
                 'message' => $e->getMessage(),

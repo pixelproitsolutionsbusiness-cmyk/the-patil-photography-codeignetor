@@ -429,7 +429,7 @@ export const generateOrderPDF = (order, settings = {}) => {
         </div>
         <div style="text-align: right;">
           <h2 style="font-size: 28px; font-weight: 800; margin: 0; color: #d4a574; letter-spacing: 1px; text-transform: uppercase;">RECEIPT</h2>
-          <p style="margin: 8px 0 0 0; font-size: 12px; color: #666;"><strong>ID:</strong> #${order._id.slice(-6).toUpperCase()}</p>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: #666;"><strong>ID:</strong> #${String(order._id || order.id || "").slice(-6).toUpperCase()}</p>
           <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
         </div>
       </div>
@@ -519,8 +519,9 @@ export const generateOrderPDF = (order, settings = {}) => {
 
   setTimeout(async () => {
     try {
-      const clientName = order.name || order.customerName || "Order";
-      await generatePDF("pdf-content", `${clientName.replace(/\s+/g, '_')}_Payment_Receipt.pdf`);
+      const rawClientName = order.name || order.customerName || "Order";
+      const sanitizedClientName = rawClientName.trim().replace(/[^a-zA-Z0-9]/g, "_").replace(/_+/g, "_");
+      await generatePDF("pdf-content", `${sanitizedClientName}_Payment_Receipt.pdf`);
     } finally {
       document.body.removeChild(tempDiv);
     }

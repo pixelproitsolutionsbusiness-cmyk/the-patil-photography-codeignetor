@@ -50,13 +50,25 @@ export default function Dashboard() {
   const [selectedTestimonial, setSelectedTestimonial] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const formatStatsData = (json) => {
+    if (json.actionRequired && Array.isArray(json.actionRequired.pendingTestimonialsList)) {
+      json.actionRequired.pendingTestimonialsList = json.actionRequired.pendingTestimonialsList.map(t => ({
+        ...t,
+        coupleName: t.coupleName || t.name || "",
+        location: t.location || t.role || "",
+        fullDescription: t.fullDescription || t.text || ""
+      }));
+    }
+    return json;
+  };
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const res = await fetch("/api/dashboard/stats");
         if (!res.ok) throw new Error("Failed to load stats");
         const json = await res.json();
-        setData(json);
+        setData(formatStatsData(json));
       } catch (err) {
         setError(err.message);
       } finally {
@@ -108,7 +120,7 @@ export default function Dashboard() {
       // Refresh stats
       const res = await fetch("/api/dashboard/stats");
       const json = await res.json();
-      setData(json);
+      setData(formatStatsData(json));
     } catch (err) {
       console.error("Error approving testimonial:", err);
     }
@@ -123,7 +135,7 @@ export default function Dashboard() {
       // Refresh stats
       const res = await fetch("/api/dashboard/stats");
       const json = await res.json();
-      setData(json);
+      setData(formatStatsData(json));
     } catch (err) {
       console.error("Error rejecting testimonial:", err);
     }

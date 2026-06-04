@@ -15,10 +15,10 @@ class Testimonials extends ResourceController
         $type = $this->request->getGet('type');
         
         if ($type === 'active') {
-            return $this->respond($this->model->where('status', 'Active')->findAll());
+            return $this->respond($this->model->where('status', 'Active')->orderBy('order', 'ASC')->orderBy('id', 'ASC')->findAll());
         }
         
-        return $this->respond($this->model->findAll());
+        return $this->respond($this->model->orderBy('order', 'ASC')->orderBy('id', 'ASC')->findAll());
     }
 
     public function create()

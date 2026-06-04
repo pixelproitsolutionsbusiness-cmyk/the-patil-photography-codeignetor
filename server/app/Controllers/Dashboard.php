@@ -45,7 +45,7 @@ class Dashboard extends ResourceController
                 'unpaidInvoicesAmount' => $invoiceModel->whereIn('paymentStatus', ['Unpaid', 'Partially Paid', 'Partial', 'Overdue'])->selectSum('grandTotal')->first()['grandTotal'] ?? 0,
                 'upcomingShootsCount' => $invoiceModel->where('eventDate >=', $today)->where('eventDate <=', date('Y-m-d', strtotime('+7 days')))->countAllResults(),
                 'unreadMessages' => $contactModel->where('status', 'New')->countAllResults(),
-                'pendingTestimonials' => $testiModel->where('status', 'Inactive')->countAllResults(),
+                'pendingTestimonials' => $testiModel->where('status', 'Pending')->countAllResults(),
                 'galleryQueue' => $galleryModel->where('status', 'Inactive')->countAllResults(),
             ];
 
@@ -53,7 +53,7 @@ class Dashboard extends ResourceController
             $actionRequired = [
                 'enquiriesNoReply' => array_map(function($e) { $e['_id'] = $e['id']; return $e; }, $enquiryModel->where('status', 'New')->limit(4)->find()),
                 'overdueInvoices' => array_map(function($i) { $i['_id'] = $i['id']; return $i; }, $invoiceModel->where('paymentStatus', 'Overdue')->limit(4)->find()),
-                'pendingTestimonialsList' => array_map(function($t) { $t['_id'] = $t['id']; return $t; }, $testiModel->where('status', 'Inactive')->limit(4)->find()),
+                'pendingTestimonialsList' => array_map(function($t) { $t['_id'] = $t['id']; return $t; }, $testiModel->where('status', 'Pending')->limit(4)->find()),
             ];
 
             // Pipeline
