@@ -39,6 +39,52 @@ class Invoices extends ResourceController
         // Remove fields not in allowedFields
         unset($data['services'], $data['items'], $data['_id'], $data['id']);
 
+        // Defensive field mapping from frontend payloads
+        if (isset($data['invoiceNo']) && empty($data['invoiceNumber'])) {
+            $data['invoiceNumber'] = $data['invoiceNo'];
+        }
+        if (isset($data['event']) && empty($data['eventType'])) {
+            $data['eventType'] = $data['event'];
+        }
+        if (isset($data['issueDate']) && empty($data['invoiceDate'])) {
+            $data['invoiceDate'] = $data['issueDate'];
+        }
+        if (isset($data['issueDate']) && empty($data['eventDate'])) {
+            $data['eventDate'] = $data['issueDate'];
+        }
+        if (isset($data['amount']) && empty($data['grandTotal'])) {
+            $data['grandTotal'] = $data['amount'];
+        }
+        if (isset($data['paid']) && empty($data['amountPaid'])) {
+            $data['amountPaid'] = $data['paid'];
+        }
+        if (isset($data['status']) && empty($data['paymentStatus'])) {
+            $data['paymentStatus'] = $data['status'];
+        }
+        if (isset($data['stage']) && empty($data['workflowStage'])) {
+            $data['workflowStage'] = $data['stage'];
+        }
+        if (isset($data['client']) && empty($data['clientName'])) {
+            $data['clientName'] = $data['client'];
+        }
+
+        // Auto-populate required database fields to avoid strict mode SQL errors
+        if (empty($data['invoiceNumber'])) {
+            $data['invoiceNumber'] = 'INV-' . date('Ymd') . '-' . sprintf('%03d', rand(1, 999));
+        }
+        if (empty($data['invoiceDate'])) {
+            $data['invoiceDate'] = date('Y-m-d');
+        }
+        if (empty($data['eventDate'])) {
+            $data['eventDate'] = date('Y-m-d');
+        }
+        if (empty($data['dueDate'])) {
+            $data['dueDate'] = date('Y-m-d', strtotime('+30 days'));
+        }
+        if (empty($data['eventType'])) {
+            $data['eventType'] = 'Wedding';
+        }
+
         if ($id = $this->model->insert($data)) {
             $itemModel = new InvoiceItemModel();
             foreach ($services as $item) {
@@ -99,6 +145,35 @@ class Invoices extends ResourceController
         
         // Remove fields not in allowedFields
         unset($data['services'], $data['items'], $data['_id'], $data['id']);
+
+        // Defensive field mapping from frontend payloads
+        if (isset($data['invoiceNo']) && empty($data['invoiceNumber'])) {
+            $data['invoiceNumber'] = $data['invoiceNo'];
+        }
+        if (isset($data['event']) && empty($data['eventType'])) {
+            $data['eventType'] = $data['event'];
+        }
+        if (isset($data['issueDate']) && empty($data['invoiceDate'])) {
+            $data['invoiceDate'] = $data['issueDate'];
+        }
+        if (isset($data['issueDate']) && empty($data['eventDate'])) {
+            $data['eventDate'] = $data['issueDate'];
+        }
+        if (isset($data['amount']) && empty($data['grandTotal'])) {
+            $data['grandTotal'] = $data['amount'];
+        }
+        if (isset($data['paid']) && empty($data['amountPaid'])) {
+            $data['amountPaid'] = $data['paid'];
+        }
+        if (isset($data['status']) && empty($data['paymentStatus'])) {
+            $data['paymentStatus'] = $data['status'];
+        }
+        if (isset($data['stage']) && empty($data['workflowStage'])) {
+            $data['workflowStage'] = $data['stage'];
+        }
+        if (isset($data['client']) && empty($data['clientName'])) {
+            $data['clientName'] = $data['client'];
+        }
 
         if ($this->model->update($id, $data)) {
             if ($services !== null) {

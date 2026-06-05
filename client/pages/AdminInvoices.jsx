@@ -210,6 +210,7 @@ export default function AdminInvoices() {
 
       const payload = {
         ...invoiceData,
+        invoiceNumber: invoiceData.invoiceNo, // Map invoiceNo -> invoiceNumber
         eventType: invoiceData.event, // Map event -> eventType
         invoiceDate: invoiceData.issueDate,
         grandTotal: Number(invoiceData.amount) || 0,

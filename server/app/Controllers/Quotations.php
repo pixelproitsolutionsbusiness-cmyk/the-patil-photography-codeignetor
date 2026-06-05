@@ -39,6 +39,23 @@ class Quotations extends ResourceController
         // Remove fields not in allowedFields
         unset($data['services'], $data['items'], $data['_id'], $data['id']);
 
+        // Auto-populate required database fields to avoid strict mode SQL errors
+        if (empty($data['quotationNumber'])) {
+            $data['quotationNumber'] = 'QT-' . date('Ymd') . '-' . sprintf('%03d', rand(1, 999));
+        }
+        if (empty($data['quotationDate'])) {
+            $data['quotationDate'] = date('Y-m-d');
+        }
+        if (empty($data['eventDate'])) {
+            $data['eventDate'] = date('Y-m-d');
+        }
+        if (empty($data['validityDate'])) {
+            $data['validityDate'] = date('Y-m-d', strtotime('+30 days'));
+        }
+        if (empty($data['eventType'])) {
+            $data['eventType'] = 'Wedding';
+        }
+
         if ($id = $this->model->insert($data)) {
             $itemModel = new QuotationItemModel();
             foreach ($services as $item) {

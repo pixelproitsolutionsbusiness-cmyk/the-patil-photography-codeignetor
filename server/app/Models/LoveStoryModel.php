@@ -13,8 +13,29 @@ class LoveStoryModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'title', 'location', 'description', 'thumbnail', 'gallery', 'status', 'display_order'
+        'title', 'location', 'description', 'thumbnail', 'gallery', 'status', 'display_order', 'order'
     ];
+
+    public function __construct()
+    {
+        parent::__construct();
+        try {
+            if ($this->db && $this->db->connID) {
+                $fields = $this->db->getFieldNames($this->table);
+                if (!empty($fields)) {
+                    $this->allowedFields = ['title', 'location', 'description', 'thumbnail', 'gallery', 'status'];
+                    if (in_array('display_order', $fields)) {
+                        $this->allowedFields[] = 'display_order';
+                    }
+                    if (in_array('order', $fields)) {
+                        $this->allowedFields[] = 'order';
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Keep default fallback
+        }
+    }
 
     // Dates
     protected $useTimestamps = true;

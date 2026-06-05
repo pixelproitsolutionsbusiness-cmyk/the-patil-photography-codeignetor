@@ -35,7 +35,13 @@ class LoveStories extends ResourceController
         }
         
         // Remove non-database fields
-        unset($data['id'], $data['_id'], $data['order'], $data['createdAt'], $data['updatedAt'], $data['created_at'], $data['updated_at']);
+        unset($data['id'], $data['_id'], $data['createdAt'], $data['updatedAt'], $data['created_at'], $data['updated_at']);
+        if (!in_array('order', $this->model->allowedFields)) {
+            unset($data['order']);
+        }
+        if (!in_array('display_order', $this->model->allowedFields)) {
+            unset($data['display_order']);
+        }
 
         log_message('debug', 'LoveStories::create - Inserting into model');
         if ($this->model->insert($data)) {
@@ -78,7 +84,13 @@ class LoveStories extends ResourceController
         }
 
         // Remove non-database fields
-        unset($data['id'], $data['_id'], $data['order'], $data['createdAt'], $data['updatedAt'], $data['created_at'], $data['updated_at']);
+        unset($data['id'], $data['_id'], $data['createdAt'], $data['updatedAt'], $data['created_at'], $data['updated_at']);
+        if (!in_array('order', $this->model->allowedFields)) {
+            unset($data['order']);
+        }
+        if (!in_array('display_order', $this->model->allowedFields)) {
+            unset($data['display_order']);
+        }
 
         log_message('debug', 'LoveStories::update - Updating model');
         if ($this->model->update($id, $data)) {

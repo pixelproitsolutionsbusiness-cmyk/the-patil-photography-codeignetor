@@ -51,21 +51,8 @@ class OrderModel extends Model
     {
         if (!isset($data['data'])) return $data;
 
-        if (isset($data['singleton']) && $data['singleton']) {
-            // Single Record
-            $row = &$data['data'];
-            if (isset($row['id'])) {
-                $row['_id'] = $row['id'];
-            }
-            if (isset($row['services']) && is_string($row['services'])) {
-                $row['services'] = json_decode($row['services'], true) ?: [];
-            }
-            if (isset($row['serviceConfig']) && is_string($row['serviceConfig'])) {
-                $row['serviceConfig'] = json_decode($row['serviceConfig'], true) ?: [];
-            }
-        } else {
-            // Collection
-            foreach ($data['data'] as &$row) {
+        $formatRow = function (&$row) {
+            if (is_array($row)) {
                 if (isset($row['id'])) {
                     $row['_id'] = $row['id'];
                 }
@@ -75,6 +62,16 @@ class OrderModel extends Model
                 if (isset($row['serviceConfig']) && is_string($row['serviceConfig'])) {
                     $row['serviceConfig'] = json_decode($row['serviceConfig'], true) ?: [];
                 }
+            }
+        };
+
+        if (isset($data['data']['id']) || (isset($data['singular']) && $data['singular'])) {
+            // Single Record
+            $formatRow($data['data']);
+        } else {
+            // Collection
+            foreach ($data['data'] as &$row) {
+                $formatRow($row);
             }
         }
         return $data;

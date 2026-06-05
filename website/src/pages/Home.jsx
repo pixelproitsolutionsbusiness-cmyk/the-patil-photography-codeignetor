@@ -154,7 +154,10 @@ export default function Home() {
   const testimonialsToShow = testimonials.slice(0, 3);
 
   /* Extract image URLs for LuxGallery */
-  const galleryImageUrls = gallery.map(item => getImageUrl(item.image));
+  const galleryImageUrls = gallery.flatMap(item => {
+    const images = Array.isArray(item.image) ? item.image : [item.image];
+    return images.map(img => getImageUrl(img));
+  });
 
   const SERVICES = [
     { icon: "◉", title: "Wedding Photography", desc: "Full-day coverage from pre-ceremony to reception — every genuine emotion preserved." },
